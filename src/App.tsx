@@ -12,7 +12,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <SnackbarProvider>
-        <BrowserRouter>
+        <BrowserRouter basename="/volta-fe/">
           <Routes>
             <Route path={ROUTES.LOGIN} element={<LoginScreen />} />
             <Route
