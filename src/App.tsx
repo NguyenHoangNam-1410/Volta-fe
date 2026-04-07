@@ -14,7 +14,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <SnackbarProvider>
-        <BrowserRouter basename="/volta/">
+        <BrowserRouter basename="/">
           <Routes>
             <Route
               path={ROUTES.LOGIN}
