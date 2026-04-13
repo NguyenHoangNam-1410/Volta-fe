@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useCallback, useState, useEffect } from 'react';
 import { isAuthenticated } from '../utils/auth-session';
 import { getCart, addProductToCart, updateCartItem, deleteCartItem, deleteCart } from '../../apis/carts/cart.api';
-import type { Cart, CartItem, RequestAddToCartDto } from '../../apis/carts/cart.interface';
+import type { Cart, RequestAddToCartDto } from '../../apis/carts/cart.interface';
 
 interface CartContextType {
     cart: Cart;
