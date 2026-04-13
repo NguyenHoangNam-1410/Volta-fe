@@ -7,8 +7,10 @@ import { OrdersTab } from './orders/orders.tab';
 import { DiscountsTab } from './discounts/discounts.tab';
 import { CustomersTab } from './customers/customers.tab';
 import { ProductsTab } from './product/products.tab';
+import { CategoriesTab } from './categories/categories.tab';
+import { BundlesTab } from './bundles/bundles.tab';
 
-type AdminPage = 'dashboard' | 'orders' | 'products' | 'discounts' | 'customers';
+type AdminPage = 'dashboard' | 'orders' | 'products' | 'categories' | 'bundles' | 'discounts' | 'customers';
 
 const NAV_SECTIONS = [
     {
@@ -22,6 +24,8 @@ const NAV_SECTIONS = [
     {
         label: 'Store',
         items: [
+            { id: 'categories' as AdminPage, label: 'Categories', icon: '▦' },
+            { id: 'bundles' as AdminPage, label: 'Bundles', icon: '▣' },
             { id: 'discounts' as AdminPage, label: 'Discounts', icon: '🏷' },
             { id: 'customers' as AdminPage, label: 'Customers', icon: '👤' },
         ],
@@ -32,6 +36,8 @@ const PAGE_TITLES: Record<AdminPage, string> = {
     dashboard: 'Dashboard',
     orders: 'Orders',
     products: 'Products',
+    categories: 'Categories',
+    bundles: 'Bundles',
     discounts: 'Discounts',
     customers: 'Customers',
 };
@@ -279,6 +285,8 @@ export const AdminScreen: React.FC = () => {
                     {page === 'dashboard'  && <DashboardTab />}
                     {page === 'products'   && <ProductsTab search={search} />}
                     {page === 'orders'     && <OrdersTab search={search} />}
+                    {page === 'categories' && <CategoriesTab search={search} />}
+                    {page === 'bundles'    && <BundlesTab search={search} />}
                     {page === 'discounts'  && <DiscountsTab />}
                     {page === 'customers'  && <CustomersTab search={search} />}
                 </Box>

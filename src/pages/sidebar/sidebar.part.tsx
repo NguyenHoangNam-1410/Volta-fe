@@ -28,7 +28,7 @@ export const Sidebar: React.FC = () => {
     const authenticated = isAuthenticated();
     const user = getStoredUser();
     const visibleRoutes = routes.filter((route) => !route.requiresAuth || authenticated);
-    const primaryRoutes = visibleRoutes.filter((route) => route.path !== '/admin');
+    const primaryRoutes = visibleRoutes.filter((route) => route.path !== '/admin' && !route.hideFromNav);
 
     const width = collapsed ? DRAWER_COLLAPSED_WIDTH : DRAWER_WIDTH;
 

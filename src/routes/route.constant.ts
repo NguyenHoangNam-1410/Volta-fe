@@ -4,18 +4,12 @@ export const ROUTES = {
     REGISTER: '/register',
     ADMIN: '/admin',
 
-    // Admin
-    // USERS: '/users',
-    // PRODUCTS: '/products',
-    // CATEGORIES: '/categories',
-    // DISCOUNTS: '/discounts',
-    // ORDERS: '/orders',
-    // BUNDLES: '/bundles',
-
     // Customer
-    // SHOP: '/shop',
-    // CART: '/cart',
-    // PROFILE: '/profile',
+    SHOP: '/shop',
+    PRODUCT_DETAIL: '/shop/:slug',
+    CART: '/cart',
+    CHECKOUT: '/checkout',
+    ORDER_SUCCESS: '/order-success',
 } as const;
 
 export const ROUTE_LABELS = {
@@ -24,16 +18,10 @@ export const ROUTE_LABELS = {
     [ROUTES.REGISTER]: 'Register',
     [ROUTES.ADMIN]: 'Admin',
 
-    // Admin
-    // [ROUTES.USERS]: 'Users',
-    // [ROUTES.PRODUCTS]: 'Products',
-    // [ROUTES.CATEGORIES]: 'Categories',
-    // [ROUTES.DISCOUNTS]: 'Discounts',
-    // [ROUTES.ORDERS]: 'Orders',
-    // [ROUTES.BUNDLES]: 'Bundles',
-
     // Customer
-    // [ROUTES.SHOP]: 'Shop',
-    // [ROUTES.CART]: 'Cart',
-    // [ROUTES.PROFILE]: 'Profile',
+    [ROUTES.SHOP]: 'Shop',
+    [ROUTES.PRODUCT_DETAIL]: 'Product Detail',
+    [ROUTES.CART]: 'Cart',
+    [ROUTES.CHECKOUT]: 'Checkout',
+    [ROUTES.ORDER_SUCCESS]: 'Order Success',
 } as const;

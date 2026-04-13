@@ -1,21 +1,12 @@
 import { ROUTES } from './route.constant';
 import type { ReactNode } from 'react';
 
-import { AdminScreen } from '../pages/screens/admin/admin.screen';
 import { HomeScreen } from '../pages/screens/public/home.screen';
-
-// Admin Screens (uncomment as implemented)
-// import { UserScreen } from '../pages/screens/users/user.screen';
-// import { ProductScreen } from '../pages/screens/products/product.screen';
-// import { CategoryScreen } from '../pages/screens/categories/category.screen';
-// import { DiscountScreen } from '../pages/screens/discounts/discount.screen';
-// import { OrderScreen } from '../pages/screens/orders/order.screen';
-// import { BundleScreen } from '../pages/screens/bundles/bundle.screen';
-
-// Customer Screens (uncomment as implemented)
-// import { ShopScreen } from '../pages/screens/shop/shop.screen';
-// import { CartScreen } from '../pages/screens/cart/cart.screen';
-// import { ProfileScreen } from '../pages/screens/profile/profile.screen';
+import { ShopScreen } from '../pages/screens/public/shop/shop.screen';
+import { ProductDetailScreen } from '../pages/screens/public/product-detail/product-detail.screen';
+import { CartScreen } from '../pages/screens/public/cart/cart.screen';
+import { CheckoutScreen } from '../pages/screens/public/checkout/checkout.screen';
+import { OrderSuccessScreen } from '../pages/screens/public/order-success/order-success.screen';
 
 export interface RouteConfig {
     path: string;
@@ -23,22 +14,14 @@ export interface RouteConfig {
     label: string;
     icon?: ReactNode;
     requiresAuth?: boolean;
+    hideFromNav?: boolean;
 }
 
 export const routes: RouteConfig[] = [
     { path: ROUTES.HOME, component: HomeScreen, label: 'Home' },
-    { path: ROUTES.ADMIN, component: AdminScreen, label: 'Admin' },
-
-    // ── Admin ──
-    // { path: ROUTES.USERS,       component: UserScreen,       label: 'Users'      },
-    // { path: ROUTES.PRODUCTS,    component: ProductScreen,    label: 'Products'   },
-    // { path: ROUTES.CATEGORIES,  component: CategoryScreen,   label: 'Categories' },
-    // { path: ROUTES.DISCOUNTS,   component: DiscountScreen,   label: 'Discounts'  },
-    // { path: ROUTES.ORDERS,      component: OrderScreen,      label: 'Orders'     },
-    // { path: ROUTES.BUNDLES,     component: BundleScreen,     label: 'Bundles'    },
-
-    // ── Customer ──
-    // { path: ROUTES.SHOP,        component: ShopScreen,       label: 'Shop'       },
-    // { path: ROUTES.CART,        component: CartScreen,        label: 'Cart'       },
-    // { path: ROUTES.PROFILE,    component: ProfileScreen,     label: 'Profile'    },
+    { path: ROUTES.SHOP, component: ShopScreen, label: 'Shop' },
+    { path: ROUTES.PRODUCT_DETAIL, component: ProductDetailScreen, label: 'Product Detail', hideFromNav: true },
+    { path: ROUTES.CART, component: CartScreen, label: 'Cart', requiresAuth: true, hideFromNav: true },
+    { path: ROUTES.CHECKOUT, component: CheckoutScreen, label: 'Checkout', requiresAuth: true, hideFromNav: true },
+    { path: ROUTES.ORDER_SUCCESS, component: OrderSuccessScreen, label: 'Order Success', requiresAuth: true, hideFromNav: true },
 ];
