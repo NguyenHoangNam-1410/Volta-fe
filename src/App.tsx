@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Box, ThemeProvider, CssBaseline } from '@mui/material';
 import { theme } from './theme';
-import { Sidebar } from './pages/sidebar/sidebar.part';
+import { Navbar } from './pages/navbar/navbar.part';
 import { RenderRoutes } from './routes/render.route';
 import { SnackbarProvider } from './common/contexts/snackbar.context';
 import { CartProvider } from './common/contexts/cart.context';
@@ -33,9 +33,9 @@ function App() {
               <Route
                 path="*"
                 element={
-                  <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-                    <Sidebar />
-                    <Box component="main" sx={{ flexGrow: 1 }}>
+                  <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff' }}>
+                    <Navbar />
+                    <Box component="main">
                       <RenderRoutes />
                     </Box>
                   </Box>

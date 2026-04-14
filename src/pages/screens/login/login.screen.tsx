@@ -283,8 +283,8 @@ export const LoginScreen: React.FC = () => {
                         onClick={() => navigate(ROUTES.REGISTER)}
                         sx={{
                             bgcolor: 'transparent',
-                            color: COLOR_BRAND.accent,
-                            border: `1.5px solid ${COLOR_BRAND.accent}`,
+                            color: COLOR_BRAND.dark,
+                            border: `1.5px solid ${COLOR_BRAND.dark}`,
                             borderRadius: 50,
                             py: 1.5,
                             fontFamily: "'Lato', sans-serif",
@@ -293,7 +293,7 @@ export const LoginScreen: React.FC = () => {
                             textTransform: 'none',
                             mb: 1.5,
                             '&:hover': {
-                                bgcolor: 'rgba(232,255,71,0.08)',
+                                bgcolor: 'rgba(26,26,26,0.04)',
                             },
                         }}
                     >

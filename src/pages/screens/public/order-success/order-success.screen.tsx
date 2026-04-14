@@ -10,29 +10,22 @@ export const OrderSuccessScreen: React.FC = () => {
     const orderId = (location.state as { orderId?: number })?.orderId;
 
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: '#fafafa', display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ bgcolor: '#ffffff', display: 'flex', alignItems: 'center', minHeight: 'calc(100vh - 64px)' }}>
             <Container maxWidth="sm" sx={{ textAlign: 'center' }}>
-                <Box
-                    sx={{
-                        bgcolor: '#fff',
-                        borderRadius: '24px',
-                        border: '1px solid #e8e8e8',
-                        p: 5,
-                    }}
-                >
+                <Box sx={{ py: 5 }}>
                     <Box
                         sx={{
                             width: 72,
                             height: 72,
                             borderRadius: '50%',
-                            bgcolor: COLOR_BRAND.accent,
+                            bgcolor: '#1a1a1a',
                             mx: 'auto',
                             mb: 3,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             fontSize: 32,
-                            color: COLOR_BRAND.dark,
+                            color: COLOR_BRAND.accent,
                             fontWeight: 800,
                         }}
                     >
@@ -44,21 +37,21 @@ export const OrderSuccessScreen: React.FC = () => {
                             fontWeight: 800,
                             fontSize: 28,
                             mb: 1,
-                            color: COLOR_BRAND.dark,
+                            color: '#1a1a1a',
                         }}
                     >
                         Order Confirmed
                     </Typography>
-                    <Typography sx={{ color: '#666', mb: 1 }}>
+                    <Typography sx={{ color: '#888', mb: 1 }}>
                         Thank you for your purchase!
                     </Typography>
                     {orderId && (
-                        <Typography sx={{ color: '#888', fontSize: 14, mb: 3 }}>
+                        <Typography sx={{ color: '#bbb', fontSize: 14, mb: 3 }}>
                             Order #{orderId}
                         </Typography>
                     )}
 
-                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 3 }}>
+                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 4 }}>
                         <VButton variant="secondary" onClick={() => navigate('/shop')} sx={{ borderRadius: '10px' }}>
                             Continue Shopping
                         </VButton>

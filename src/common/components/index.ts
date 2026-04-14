@@ -5,3 +5,5 @@ export * from './VDisplayField';
 export * from './VAvatar';
 export * from './VToggle';
 export * from './ScreenLayout';
+export * from './VBreadcrumb';
+

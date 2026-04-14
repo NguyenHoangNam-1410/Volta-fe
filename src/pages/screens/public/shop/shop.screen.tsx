@@ -12,19 +12,19 @@ import {
     CircularProgress,
     Chip,
 } from '@mui/material';
-import { COLOR_BRAND } from '../../../../common/constants/color.constant';
 import { getShops, getShopCategories } from '../../../../apis/shops/shop.api';
 import type { Product } from '../../../../apis/products/product.interface';
 import type { Category } from '../../../../apis/categories/category.interface';
 import { VButton } from '../../../../common/components';
+import { VBreadcrumb } from '../../../../common/components/VBreadcrumb';
 import { useCart } from '../../../../common/contexts/cart.context';
 import { isAuthenticated } from '../../../../common/utils/auth-session';
 
 const badgeVisual: Record<string, { text: string; bg: string }> = {
-    hot: { text: '#ff4d4d', bg: 'rgba(255,77,77,0.14)' },
-    sale: { text: '#ffaa4d', bg: 'rgba(255,170,77,0.14)' },
-    new: { text: '#4da6ff', bg: 'rgba(77,166,255,0.14)' },
-    none: { text: '#888', bg: 'rgba(136,136,136,0.14)' },
+    hot: { text: '#e53935', bg: '#ffeaea' },
+    sale: { text: '#e65100', bg: '#fff3e0' },
+    new: { text: '#1565c0', bg: '#e3f2fd' },
+    none: { text: '#888', bg: '#f5f5f5' },
 };
 
 export const ShopScreen: React.FC = () => {
@@ -80,43 +80,56 @@ export const ShopScreen: React.FC = () => {
     };
 
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: '#fafafa' }}>
+        <Box sx={{ bgcolor: '#ffffff' }}>
             <Container maxWidth="xl" sx={{ py: 4 }}>
-                <Typography
-                    sx={{
-                        fontFamily: '"Syne", sans-serif',
-                        fontSize: 32,
-                        fontWeight: 800,
-                        mb: 0.5,
-                        color: COLOR_BRAND.dark,
-                    }}
-                >
-                    Shop
-                </Typography>
-                <Typography sx={{ color: '#666', mb: 3 }}>
-                    Browse our tech collection
-                </Typography>
+                <VBreadcrumb items={[{ label: 'Home', path: '/' }, { label: 'Shop' }]} />
+
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                    <Box>
+                        <Typography
+                            sx={{
+                                fontFamily: '"Syne", sans-serif',
+                                fontSize: 28,
+                                fontWeight: 800,
+                                color: '#1a1a1a',
+                            }}
+                        >
+                            Shop
+                        </Typography>
+                        <Typography sx={{ color: '#999', fontSize: 14 }}>
+                            Browse our tech collection
+                        </Typography>
+                    </Box>
+                    <Select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        size="small"
+                        sx={{
+                            minWidth: 180,
+                            borderRadius: '10px',
+                            fontSize: 13,
+                            '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e8e8e8' },
+                        }}
+                    >
+                        <MenuItem value="newest">Newest</MenuItem>
+                        <MenuItem value="price_asc">Price: Low to High</MenuItem>
+                        <MenuItem value="price_desc">Price: High to Low</MenuItem>
+                        <MenuItem value="name">Name A-Z</MenuItem>
+                    </Select>
+                </Box>
 
                 <Box sx={{ display: 'flex', gap: 4 }}>
                     {/* Sidebar filters */}
                     <Box
                         sx={{
-                            width: 240,
+                            width: 220,
                             flexShrink: 0,
                             display: { xs: 'none', md: 'block' },
                         }}
                     >
-                        <Box
-                            sx={{
-                                bgcolor: '#fff',
-                                borderRadius: '16px',
-                                border: '1px solid #e8e8e8',
-                                p: 2.5,
-                                mb: 2,
-                            }}
-                        >
+                        <Box sx={{ mb: 3 }}>
                             <Typography
-                                sx={{ fontSize: 13, fontWeight: 700, mb: 1.5, color: COLOR_BRAND.dark, textTransform: 'uppercase', letterSpacing: 1 }}
+                                sx={{ fontSize: 12, fontWeight: 600, mb: 1.5, color: '#999', textTransform: 'uppercase', letterSpacing: 1 }}
                             >
                                 Category
                             </Typography>
@@ -124,15 +137,16 @@ export const ShopScreen: React.FC = () => {
                                 onClick={() => setCategoryId('')}
                                 sx={{
                                     py: 0.75,
-                                    px: 1.25,
+                                    px: 1.5,
                                     borderRadius: '8px',
                                     cursor: 'pointer',
-                                    bgcolor: categoryId === '' ? COLOR_BRAND.accent : 'transparent',
-                                    color: categoryId === '' ? COLOR_BRAND.dark : '#555',
+                                    bgcolor: categoryId === '' ? '#1a1a1a' : 'transparent',
+                                    color: categoryId === '' ? '#fff' : '#555',
                                     fontWeight: categoryId === '' ? 600 : 400,
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     mb: 0.5,
-                                    '&:hover': { bgcolor: categoryId === '' ? COLOR_BRAND.accent : '#f0f0f0' },
+                                    transition: 'all 0.15s',
+                                    '&:hover': { bgcolor: categoryId === '' ? '#1a1a1a' : '#f5f5f5' },
                                 }}
                             >
                                 All
@@ -143,15 +157,16 @@ export const ShopScreen: React.FC = () => {
                                     onClick={() => setCategoryId(cat.id)}
                                     sx={{
                                         py: 0.75,
-                                        px: 1.25,
+                                        px: 1.5,
                                         borderRadius: '8px',
                                         cursor: 'pointer',
-                                        bgcolor: categoryId === cat.id ? COLOR_BRAND.accent : 'transparent',
-                                        color: categoryId === cat.id ? COLOR_BRAND.dark : '#555',
+                                        bgcolor: categoryId === cat.id ? '#1a1a1a' : 'transparent',
+                                        color: categoryId === cat.id ? '#fff' : '#555',
                                         fontWeight: categoryId === cat.id ? 600 : 400,
-                                        fontSize: 14,
+                                        fontSize: 13,
                                         mb: 0.5,
-                                        '&:hover': { bgcolor: categoryId === cat.id ? COLOR_BRAND.accent : '#f0f0f0' },
+                                        transition: 'all 0.15s',
+                                        '&:hover': { bgcolor: categoryId === cat.id ? '#1a1a1a' : '#f5f5f5' },
                                     }}
                                 >
                                     {cat.name}
@@ -159,16 +174,9 @@ export const ShopScreen: React.FC = () => {
                             ))}
                         </Box>
 
-                        <Box
-                            sx={{
-                                bgcolor: '#fff',
-                                borderRadius: '16px',
-                                border: '1px solid #e8e8e8',
-                                p: 2.5,
-                            }}
-                        >
+                        <Box>
                             <Typography
-                                sx={{ fontSize: 13, fontWeight: 700, mb: 1.5, color: COLOR_BRAND.dark, textTransform: 'uppercase', letterSpacing: 1 }}
+                                sx={{ fontSize: 12, fontWeight: 600, mb: 1.5, color: '#999', textTransform: 'uppercase', letterSpacing: 1 }}
                             >
                                 Price Range
                             </Typography>
@@ -179,11 +187,18 @@ export const ShopScreen: React.FC = () => {
                                 min={0}
                                 max={10000}
                                 sx={{
-                                    color: COLOR_BRAND.dark,
-                                    '& .MuiSlider-thumb': { bgcolor: COLOR_BRAND.accent, border: `2px solid ${COLOR_BRAND.dark}` },
+                                    color: '#1a1a1a',
+                                    '& .MuiSlider-thumb': {
+                                        bgcolor: '#fff',
+                                        border: '2px solid #1a1a1a',
+                                        width: 16,
+                                        height: 16,
+                                    },
+                                    '& .MuiSlider-track': { bgcolor: '#1a1a1a' },
+                                    '& .MuiSlider-rail': { bgcolor: '#e0e0e0' },
                                 }}
                             />
-                            <Typography sx={{ fontSize: 12, color: '#888' }}>
+                            <Typography sx={{ fontSize: 12, color: '#999' }}>
                                 ${priceRange[0]} - ${priceRange[1]}
                             </Typography>
                         </Box>
@@ -191,29 +206,9 @@ export const ShopScreen: React.FC = () => {
 
                     {/* Products grid */}
                     <Box sx={{ flex: 1 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                            <Select
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                                size="small"
-                                sx={{
-                                    minWidth: 180,
-                                    bgcolor: '#fff',
-                                    borderRadius: '8px',
-                                    fontSize: 13,
-                                    '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e0e0e0' },
-                                }}
-                            >
-                                <MenuItem value="newest">Newest</MenuItem>
-                                <MenuItem value="price_asc">Price: Low to High</MenuItem>
-                                <MenuItem value="price_desc">Price: High to Low</MenuItem>
-                                <MenuItem value="name">Name A-Z</MenuItem>
-                            </Select>
-                        </Box>
-
                         {isLoading ? (
                             <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-                                <CircularProgress sx={{ color: COLOR_BRAND.dark }} />
+                                <CircularProgress sx={{ color: '#1a1a1a' }} />
                             </Box>
                         ) : (
                             <>
@@ -230,15 +225,14 @@ export const ShopScreen: React.FC = () => {
                                             <Box
                                                 key={product.id}
                                                 sx={{
-                                                    bgcolor: '#fff',
+                                                    bgcolor: '#ffffff',
                                                     borderRadius: '16px',
-                                                    border: '1px solid #e8e8e8',
+                                                    border: '1px solid #f0f0f0',
                                                     overflow: 'hidden',
                                                     transition: 'transform 0.2s, box-shadow 0.2s',
-                                                    cursor: 'pointer',
                                                     '&:hover': {
                                                         transform: 'translateY(-4px)',
-                                                        boxShadow: '0 12px 32px rgba(0,0,0,0.08)',
+                                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
                                                     },
                                                 }}
                                             >
@@ -246,13 +240,14 @@ export const ShopScreen: React.FC = () => {
                                                     onClick={() => navigate(`/shop/${product.id}`)}
                                                     sx={{
                                                         height: 180,
-                                                        bgcolor: '#f5f5f5',
+                                                        bgcolor: '#fafafa',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
+                                                        cursor: 'pointer',
                                                     }}
                                                 >
-                                                    <Typography sx={{ color: '#bbb', fontSize: 13 }}>
+                                                    <Typography sx={{ color: '#ccc', fontSize: 13 }}>
                                                         {product.name}
                                                     </Typography>
                                                 </Box>
@@ -273,15 +268,15 @@ export const ShopScreen: React.FC = () => {
                                                     )}
                                                     <Typography
                                                         onClick={() => navigate(`/shop/${product.id}`)}
-                                                        sx={{ fontWeight: 600, fontSize: 15, color: COLOR_BRAND.dark, mb: 0.5, cursor: 'pointer' }}
+                                                        sx={{ fontWeight: 600, fontSize: 14, color: '#1a1a1a', mb: 0.5, cursor: 'pointer' }}
                                                     >
                                                         {product.name}
                                                     </Typography>
-                                                    <Typography sx={{ color: '#888', fontSize: 12, mb: 1.5 }}>
+                                                    <Typography sx={{ color: '#999', fontSize: 12, mb: 1.5 }}>
                                                         {product.stock > 0 ? `In stock (${product.stock})` : 'Out of stock'}
                                                     </Typography>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                        <Typography sx={{ fontWeight: 800, fontSize: 20, color: COLOR_BRAND.dark }}>
+                                                        <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a' }}>
                                                             ${Number(product.price).toFixed(2)}
                                                         </Typography>
                                                         <VButton
@@ -302,7 +297,7 @@ export const ShopScreen: React.FC = () => {
 
                                 {sorted.length === 0 && (
                                     <Box sx={{ textAlign: 'center', py: 8 }}>
-                                        <Typography sx={{ color: '#888' }}>No products found</Typography>
+                                        <Typography sx={{ color: '#999' }}>No products found</Typography>
                                     </Box>
                                 )}
 
@@ -313,8 +308,8 @@ export const ShopScreen: React.FC = () => {
                                         onChange={(_e, v) => setPage(v)}
                                         sx={{
                                             '& .Mui-selected': {
-                                                bgcolor: `${COLOR_BRAND.accent} !important`,
-                                                color: COLOR_BRAND.dark,
+                                                bgcolor: '#1a1a1a !important',
+                                                color: '#fff',
                                                 fontWeight: 700,
                                             },
                                         }}

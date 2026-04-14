@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import {
     Box,
-    Button,
     Chip,
     CircularProgress,
     Container,
@@ -10,66 +10,100 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import { A } from '../admin/admin.constants';
+import { COLOR_BRAND } from '../../../common/constants/color.constant';
 import { getShops, getFeaturedProducts } from '../../../apis/shops/shop.api';
 import { getActiveBundles } from '../../../apis/bundles/bundle.api';
 import type { Product } from '../../../apis/products/product.interface';
 import { ProductBadge } from '../../../apis/products/product.enum';
 import type { Bundle } from '../../../apis/bundles/bundle.interface';
+import { VButton } from '../../../common/components';
+import { useCart } from '../../../common/contexts/cart.context';
+import { isAuthenticated } from '../../../common/utils/auth-session';
 
 const badgeVisual: Record<string, { text: string; bg: string }> = {
-    hot: { text: '#ff4d4d', bg: 'rgba(255,77,77,0.14)' },
-    sale: { text: '#ffaa4d', bg: 'rgba(255,170,77,0.14)' },
-    new: { text: '#4da6ff', bg: 'rgba(77,166,255,0.14)' },
-    none: { text: '#888', bg: 'rgba(136,136,136,0.14)' },
+    hot: { text: '#e53935', bg: '#ffeaea' },
+    sale: { text: '#e65100', bg: '#fff3e0' },
+    new: { text: '#1565c0', bg: '#e3f2fd' },
+    none: { text: '#888', bg: '#f5f5f5' },
 };
 
-const featuredOrder = [ProductBadge.HOT, ProductBadge.SALE, ProductBadge.NEW, ProductBadge.NONE] as const;
+const featuredOrder = [ProductBadge.HOT, ProductBadge.SALE, ProductBadge.NEW] as const;
 
-const sectionLabel: Record<ProductBadge, string> = {
-    [ProductBadge.HOT]: 'Top selected - Hot',
-    [ProductBadge.SALE]: 'Top selected - Sale',
-    [ProductBadge.NEW]: 'Top selected - New',
-    [ProductBadge.NONE]: 'Top selected - None',
+const sectionLabel: Record<string, string> = {
+    [ProductBadge.HOT]: 'Hot deals',
+    [ProductBadge.SALE]: 'On sale',
+    [ProductBadge.NEW]: 'Just arrived',
 };
 
-function ProductCard({ product }: { product: Product }) {
+function HomeProductCard({ product, onNavigate, onAddToCart }: { product: Product; onNavigate: () => void; onAddToCart: () => void }) {
     const style = badgeVisual[product.badge] ?? badgeVisual.none;
 
     return (
         <Box
             sx={{
-                p: 2,
+                bgcolor: '#ffffff',
                 borderRadius: '16px',
-                border: `1px solid ${A.border}`,
-                bgcolor: A.surface,
-                minHeight: 164,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
+                border: '1px solid #f0f0f0',
+                overflow: 'hidden',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                },
             }}
         >
-            <Box>
-                <Chip
-                    label={product.badge.toUpperCase()}
-                    size="small"
-                    sx={{
-                        bgcolor: style.bg,
-                        color: style.text,
-                        border: `1px solid ${style.text}33`,
-                        fontSize: 10,
-                        fontWeight: 700,
-                        mb: 1.25,
-                    }}
-                />
-                <Typography sx={{ color: A.text, fontWeight: 700, mb: 0.5, lineHeight: 1.35 }}>
+            <Box
+                onClick={onNavigate}
+                sx={{
+                    height: 180,
+                    bgcolor: '#fafafa',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                }}
+            >
+                <Typography sx={{ color: '#ccc', fontSize: 13 }}>{product.name}</Typography>
+            </Box>
+            <Box sx={{ p: 2 }}>
+                {product.badge !== 'none' && (
+                    <Chip
+                        label={product.badge.toUpperCase()}
+                        size="small"
+                        sx={{
+                            bgcolor: style.bg,
+                            color: style.text,
+                            fontSize: 10,
+                            fontWeight: 700,
+                            mb: 1,
+                            height: 22,
+                        }}
+                    />
+                )}
+                <Typography
+                    onClick={onNavigate}
+                    sx={{ fontWeight: 600, fontSize: 14, color: '#1a1a1a', mb: 0.5, cursor: 'pointer', lineHeight: 1.4 }}
+                >
                     {product.name}
                 </Typography>
-                <Typography sx={{ color: A.dim, fontSize: 12 }}>Stock: {product.stock}</Typography>
+                <Typography sx={{ color: '#999', fontSize: 12, mb: 1 }}>
+                    {product.stock > 0 ? `In stock` : 'Out of stock'}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a' }}>
+                        ${Number(product.price).toFixed(2)}
+                    </Typography>
+                    <VButton
+                        variant="secondary"
+                        size="small"
+                        onClick={onAddToCart}
+                        disabled={product.stock <= 0}
+                        sx={{ borderRadius: '8px', fontSize: 12 }}
+                    >
+                        Add
+                    </VButton>
+                </Box>
             </Box>
-            <Typography sx={{ mt: 1.5, color: A.accent, fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22 }}>
-                ${Number(product.price).toFixed(2)}
-            </Typography>
         </Box>
     );
 }
@@ -78,45 +112,34 @@ function BundleCard({ bundle }: { bundle: Bundle }) {
     return (
         <Box
             sx={{
-                p: 2.25,
+                p: 2.5,
                 borderRadius: '16px',
-                border: `1px solid ${A.border}`,
-                background: 'linear-gradient(180deg, rgba(26,26,26,1) 0%, rgba(20,20,20,0.92) 100%)',
-                minHeight: 170,
+                bgcolor: '#1a1a1a',
+                color: '#fff',
+                minHeight: 160,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
+                transition: 'transform 0.2s',
+                '&:hover': { transform: 'translateY(-2px)' },
             }}
         >
             <Box>
-                <Typography sx={{ color: A.text, fontWeight: 700, mb: 0.5 }}>{bundle.name}</Typography>
-                <Typography sx={{ color: A.dim, fontSize: 13, lineHeight: 1.6 }}>
-                    {bundle.description || 'Curated bundle to increase average cart value.'}
+                <Typography sx={{ fontWeight: 700, mb: 0.5 }}>{bundle.name}</Typography>
+                <Typography sx={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, lineHeight: 1.6 }}>
+                    {bundle.description || 'Curated bundle for best value.'}
                 </Typography>
             </Box>
-            <Typography sx={{ mt: 1.5, color: A.green, fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 21 }}>
+            <Typography sx={{ mt: 1.5, color: COLOR_BRAND.accent, fontWeight: 800, fontSize: 22 }}>
                 ${Number(bundle.bundle_price).toFixed(2)}
             </Typography>
         </Box>
     );
 }
 
-function EmptyListState() {
-    return (
-        <Box
-            sx={{
-                p: 2,
-                borderRadius: '12px',
-                border: `1px dashed ${A.border}`,
-                bgcolor: A.s2,
-            }}
-        >
-            <Typography sx={{ color: A.dim, fontSize: 13 }}>Nothing here...</Typography>
-        </Box>
-    );
-}
-
 export const HomeScreen: React.FC = () => {
+    const navigate = useNavigate();
+    const { addToCart } = useCart();
     const [searchInput, setSearchInput] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [hasSearched, setHasSearched] = useState(false);
@@ -141,11 +164,6 @@ export const HomeScreen: React.FC = () => {
         () => getFeaturedProducts({ badge: ProductBadge.NEW, limit: 4 }).then((res) => res.data),
     );
 
-    const { data: noneProducts, isLoading: noneLoading } = useSWR<Product[]>(
-        ['featured', ProductBadge.NONE],
-        () => getFeaturedProducts({ badge: ProductBadge.NONE, limit: 4 }).then((res) => res.data),
-    );
-
     const { data: bundles, isLoading: bundleLoading } = useSWR<Bundle[]>(
         ['bundles-active'],
         () => getActiveBundles().then((res) => res.data),
@@ -165,18 +183,16 @@ export const HomeScreen: React.FC = () => {
         return source.slice(0, 8);
     }, [availableProducts]);
 
-    const featuredMap: Record<ProductBadge, Product[] | undefined> = {
+    const featuredMap: Record<string, Product[] | undefined> = {
         [ProductBadge.HOT]: hotProducts,
         [ProductBadge.SALE]: saleProducts,
         [ProductBadge.NEW]: newProducts,
-        [ProductBadge.NONE]: noneProducts,
     };
 
-    const featuredLoading: Record<ProductBadge, boolean> = {
+    const featuredLoading: Record<string, boolean> = {
         [ProductBadge.HOT]: hotLoading,
         [ProductBadge.SALE]: saleLoading,
         [ProductBadge.NEW]: newLoading,
-        [ProductBadge.NONE]: noneLoading,
     };
 
     const runSearch = () => {
@@ -184,140 +200,180 @@ export const HomeScreen: React.FC = () => {
         setHasSearched(true);
     };
 
+    const handleAddToCart = async (product: Product) => {
+        if (!isAuthenticated()) {
+            navigate('/login');
+            return;
+        }
+        await addToCart({ product_id: product.id, quantity: 1 });
+    };
+
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: A.bg, color: A.text }}>
-            <Container maxWidth="xl" sx={{ py: 3 }}>
-                <Box sx={{ mb: 3, p: 2.5, borderRadius: '16px', border: `1px solid ${A.border}`, bgcolor: A.surface }}>
-                    <Typography sx={{ fontFamily: '"Syne", sans-serif', fontSize: 28, fontWeight: 800, mb: 0.5 }}>
-                        Volta E-commerce Home
+        <Box sx={{ bgcolor: '#ffffff' }}>
+            <Container maxWidth="xl" sx={{ py: 4 }}>
+                {/* Hero */}
+                <Box
+                    sx={{
+                        mb: 5,
+                        p: { xs: 3, md: 5 },
+                        borderRadius: '20px',
+                        bgcolor: '#1a1a1a',
+                        color: '#fff',
+                        position: 'relative',
+                        overflow: 'hidden',
+                    }}
+                >
+                    <Typography
+                        sx={{
+                            fontFamily: '"Syne", sans-serif',
+                            fontSize: { xs: 28, md: 40 },
+                            fontWeight: 800,
+                            mb: 1,
+                            lineHeight: 1.2,
+                        }}
+                    >
+                        Technology for<br />
+                        <Box component="span" sx={{ color: COLOR_BRAND.accent }}>
+                            everyone.
+                        </Box>
                     </Typography>
-                    <Typography sx={{ color: A.dim, mb: 2 }}>
-                        Customer-facing storefront. The Admin page remains the combined statistics dashboard.
+                    <Typography sx={{ color: 'rgba(255,255,255,0.6)', mb: 3, maxWidth: 480 }}>
+                        Discover premium tech products at competitive prices. From gadgets to gear, we have it all.
                     </Typography>
 
-                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr auto' }, gap: 1.25 }}>
+                    <Box sx={{ display: 'flex', gap: 1.5, maxWidth: 480 }}>
                         <TextField
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') runSearch();
-                            }}
-                            placeholder="Search"
+                            onKeyDown={(e) => { if (e.key === 'Enter') runSearch(); }}
+                            placeholder="Search products..."
+                            size="small"
                             slotProps={{
                                 input: {
-                                    startAdornment: <InputAdornment position="start">⌕</InputAdornment>,
+                                    startAdornment: <InputAdornment position="start" sx={{ color: '#999' }}>{'Q'}</InputAdornment>,
                                 },
                             }}
                             sx={{
+                                flex: 1,
                                 '& .MuiOutlinedInput-root': {
-                                    bgcolor: A.s2,
-                                    color: A.text,
+                                    bgcolor: 'rgba(255,255,255,0.1)',
+                                    color: '#fff',
+                                    borderRadius: '10px',
+                                    '& fieldset': { borderColor: 'rgba(255,255,255,0.15)' },
+                                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
                                 },
+                                '& input::placeholder': { color: 'rgba(255,255,255,0.4)' },
                             }}
                         />
-                        <Button
-                            onClick={runSearch}
-                            sx={{ bgcolor: A.accent, color: A.bg, textTransform: 'none', px: 3, '&:hover': { bgcolor: '#d5ea35' } }}
-                        >
+                        <VButton variant="secondary" onClick={runSearch} sx={{ borderRadius: '10px' }}>
                             Search
-                        </Button>
+                        </VButton>
                     </Box>
 
-                    <Box sx={{ mt: 1.5 }}>
-                        {!hasSearched ? (
-                            <Typography sx={{ color: A.dim, fontSize: 13 }}>
-                                Enter a query and press Search.
-                            </Typography>
-                        ) : searchLoading ? (
-                            <CircularProgress size={18} sx={{ color: A.accent }} />
-                        ) : (
-                            <Typography sx={{ color: A.dim, fontSize: 13 }}>
-                                Search results found: {(searchedProducts ?? []).length}
-                            </Typography>
-                        )}
-                    </Box>
-
-                    {hasSearched && !searchLoading && (
-                        <Box sx={{ mt: 1.5, display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', xl: 'repeat(4, 1fr)' }, gap: 1.25 }}>
-                            {(searchedProducts ?? []).length > 0 ? (
-                                (searchedProducts ?? []).map((product) => (
-                                    <ProductCard key={`search-${product.id}`} product={product} />
-                                ))
+                    {hasSearched && (
+                        <Box sx={{ mt: 2 }}>
+                            {searchLoading ? (
+                                <CircularProgress size={18} sx={{ color: COLOR_BRAND.accent }} />
                             ) : (
-                                <EmptyListState />
+                                <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>
+                                    {(searchedProducts ?? []).length} results found
+                                </Typography>
                             )}
                         </Box>
                     )}
                 </Box>
 
-                <Box sx={{ mb: 3.5 }}>
-                    <Typography sx={{ fontFamily: '"Syne", sans-serif', fontSize: 22, fontWeight: 800, mb: 1.5 }}>
-                        Top selected
-                    </Typography>
+                {/* Search results */}
+                {hasSearched && !searchLoading && (searchedProducts ?? []).length > 0 && (
+                    <Box sx={{ mb: 5 }}>
+                        <Typography sx={{ fontSize: 20, fontWeight: 700, mb: 2, color: '#1a1a1a' }}>
+                            Search Results
+                        </Typography>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }, gap: 2 }}>
+                            {(searchedProducts ?? []).map((product) => (
+                                <HomeProductCard
+                                    key={`search-${product.id}`}
+                                    product={product}
+                                    onNavigate={() => navigate(`/shop/${product.id}`)}
+                                    onAddToCart={() => handleAddToCart(product)}
+                                />
+                            ))}
+                        </Box>
+                    </Box>
+                )}
 
-                    {featuredOrder.map((badge) => (
-                        <Box key={badge} sx={{ mb: 2.25 }}>
-                            <Typography sx={{ color: A.accent, fontSize: 12, letterSpacing: 1.1, textTransform: 'uppercase', mb: 1 }}>
+                {/* Featured sections */}
+                {featuredOrder.map((badge) => (
+                    <Box key={badge} sx={{ mb: 5 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                            <Typography sx={{ fontSize: 20, fontWeight: 700, color: '#1a1a1a' }}>
                                 {sectionLabel[badge]}
                             </Typography>
-
-                            {featuredLoading[badge] ? (
-                                <CircularProgress size={18} sx={{ color: A.accent }} />
-                            ) : (
-                                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', xl: 'repeat(4, 1fr)' }, gap: 1.25 }}>
-                                    {(featuredMap[badge] ?? []).length > 0 ? (
-                                        (featuredMap[badge] ?? []).map((product) => (
-                                            <ProductCard key={`${badge}-${product.id}`} product={product} />
-                                        ))
-                                    ) : (
-                                        <EmptyListState />
-                                    )}
-                                </Box>
-                            )}
-                        </Box>
-                    ))}
-
-                    <Box>
-                        <Typography sx={{ color: A.accent, fontSize: 12, letterSpacing: 1.1, textTransform: 'uppercase', mb: 1 }}>
-                            Bundles
-                        </Typography>
-
-                        {bundleLoading ? (
-                            <CircularProgress size={18} sx={{ color: A.accent }} />
-                        ) : (
-                            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', xl: 'repeat(3, 1fr)' }, gap: 1.25 }}>
-                                {(bundles ?? []).length > 0 ? (
-                                    (bundles ?? []).map((bundle) => (
-                                        <BundleCard key={`bundle-${bundle.id}`} bundle={bundle} />
-                                    ))
-                                ) : (
-                                    <EmptyListState />
-                                )}
+                            <Box
+                                onClick={() => navigate('/shop')}
+                                sx={{ fontSize: 13, color: '#999', cursor: 'pointer', '&:hover': { color: '#555' } }}
+                            >
+                                View all
                             </Box>
+                        </Box>
+
+                        {featuredLoading[badge] ? (
+                            <CircularProgress size={20} sx={{ color: '#1a1a1a' }} />
+                        ) : (featuredMap[badge] ?? []).length > 0 ? (
+                            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }, gap: 2 }}>
+                                {(featuredMap[badge] ?? []).map((product) => (
+                                    <HomeProductCard
+                                        key={`${badge}-${product.id}`}
+                                        product={product}
+                                        onNavigate={() => navigate(`/shop/${product.id}`)}
+                                        onAddToCart={() => handleAddToCart(product)}
+                                    />
+                                ))}
+                            </Box>
+                        ) : (
+                            <Typography sx={{ color: '#ccc', fontSize: 13 }}>No products yet</Typography>
                         )}
                     </Box>
+                ))}
+
+                {/* Bundles */}
+                <Box sx={{ mb: 5 }}>
+                    <Typography sx={{ fontSize: 20, fontWeight: 700, mb: 2, color: '#1a1a1a' }}>
+                        Bundles
+                    </Typography>
+                    {bundleLoading ? (
+                        <CircularProgress size={20} sx={{ color: '#1a1a1a' }} />
+                    ) : (bundles ?? []).length > 0 ? (
+                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', xl: 'repeat(3, 1fr)' }, gap: 2 }}>
+                            {(bundles ?? []).map((bundle) => (
+                                <BundleCard key={`bundle-${bundle.id}`} bundle={bundle} />
+                            ))}
+                        </Box>
+                    ) : (
+                        <Typography sx={{ color: '#ccc', fontSize: 13 }}>No bundles available</Typography>
+                    )}
                 </Box>
 
+                {/* Available products */}
                 <Box>
-                    <Typography sx={{ fontFamily: '"Syne", sans-serif', fontSize: 22, fontWeight: 800, mb: 1.5 }}>
-                        Currently available
+                    <Typography sx={{ fontSize: 20, fontWeight: 700, mb: 2, color: '#1a1a1a' }}>
+                        Explore more
                     </Typography>
-                    <Typography sx={{ color: A.dim, fontSize: 13, mb: 1.25 }}>
-                        Randomized list of available products.
-                    </Typography>
-
                     {availableLoading ? (
-                        <CircularProgress size={20} sx={{ color: A.accent }} />
-                    ) : (
-                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', xl: 'repeat(4, 1fr)' }, gap: 1.25 }}>
-                            {randomAvailable.length > 0 ? (
-                                randomAvailable.map((product) => (
-                                    <ProductCard key={`available-${product.id}`} product={product} />
-                                ))
-                            ) : (
-                                <EmptyListState />
-                            )}
+                        <CircularProgress size={20} sx={{ color: '#1a1a1a' }} />
+                    ) : randomAvailable.length > 0 ? (
+                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }, gap: 2 }}>
+                            {randomAvailable.map((product) => (
+                                <HomeProductCard
+                                    key={`available-${product.id}`}
+                                    product={product}
+                                    onNavigate={() => navigate(`/shop/${product.id}`)}
+                                    onAddToCart={() => handleAddToCart(product)}
+                                />
+                            ))}
                         </Box>
+                    ) : (
+                        <Typography sx={{ color: '#ccc', fontSize: 13 }}>No products available</Typography>
                     )}
                 </Box>
             </Container>

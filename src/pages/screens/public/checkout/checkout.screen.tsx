@@ -11,11 +11,11 @@ import {
     Radio,
     TextField,
 } from '@mui/material';
-import { COLOR_BRAND } from '../../../../common/constants/color.constant';
 import { useCart } from '../../../../common/contexts/cart.context';
 import { checkoutCart, applyDiscount, placeOrder } from '../../../../apis/carts/cart.api';
 import type { CheckOutCartResponse } from '../../../../apis/carts/cart.interface';
 import { VButton } from '../../../../common/components';
+import { VBreadcrumb } from '../../../../common/components/VBreadcrumb';
 import { useSnackbar } from '../../../../common/contexts/snackbar.context';
 
 export const CheckoutScreen: React.FC = () => {
@@ -75,7 +75,7 @@ export const CheckoutScreen: React.FC = () => {
     if (isLoading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-                <CircularProgress sx={{ color: COLOR_BRAND.dark }} />
+                <CircularProgress sx={{ color: '#1a1a1a' }} />
             </Box>
         );
     }
@@ -83,7 +83,7 @@ export const CheckoutScreen: React.FC = () => {
     if (!checkoutData || checkoutData.items.length === 0) {
         return (
             <Container maxWidth="lg" sx={{ py: 8, textAlign: 'center' }}>
-                <Typography sx={{ color: '#888', mb: 2 }}>Your cart is empty</Typography>
+                <Typography sx={{ color: '#999', mb: 2 }}>Your cart is empty</Typography>
                 <VButton variant="secondary" onClick={() => navigate('/shop')}>Go to Shop</VButton>
             </Container>
         );
@@ -92,15 +92,17 @@ export const CheckoutScreen: React.FC = () => {
     const finalTotal = discountResult?.total ?? checkoutData.subtotal;
 
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: '#fafafa' }}>
+        <Box sx={{ bgcolor: '#ffffff' }}>
             <Container maxWidth="lg" sx={{ py: 4 }}>
+                <VBreadcrumb items={[{ label: 'Home', path: '/' }, { label: 'Cart', path: '/cart' }, { label: 'Checkout' }]} />
+
                 <Typography
                     sx={{
                         fontFamily: '"Syne", sans-serif',
-                        fontSize: 32,
+                        fontSize: 28,
                         fontWeight: 800,
                         mb: 3,
-                        color: COLOR_BRAND.dark,
+                        color: '#1a1a1a',
                     }}
                 >
                     Checkout
@@ -110,12 +112,12 @@ export const CheckoutScreen: React.FC = () => {
                     {/* Left — address + discount */}
                     <Box sx={{ flex: 1 }}>
                         {/* Address */}
-                        <Box sx={{ bgcolor: '#fff', borderRadius: '20px', border: '1px solid #e8e8e8', p: 3, mb: 3 }}>
-                            <Typography sx={{ fontWeight: 700, fontSize: 18, mb: 2, color: COLOR_BRAND.dark }}>
+                        <Box sx={{ mb: 3 }}>
+                            <Typography sx={{ fontWeight: 700, fontSize: 16, mb: 2, color: '#1a1a1a' }}>
                                 Delivery Address
                             </Typography>
                             {checkoutData.address.length === 0 ? (
-                                <Typography sx={{ color: '#888', fontSize: 14 }}>
+                                <Typography sx={{ color: '#999', fontSize: 14 }}>
                                     No addresses found. Please add one in your profile.
                                 </Typography>
                             ) : (
@@ -127,13 +129,13 @@ export const CheckoutScreen: React.FC = () => {
                                         <FormControlLabel
                                             key={addr.id}
                                             value={addr.id}
-                                            control={<Radio sx={{ color: COLOR_BRAND.dark, '&.Mui-checked': { color: COLOR_BRAND.dark } }} />}
+                                            control={<Radio sx={{ color: '#ccc', '&.Mui-checked': { color: '#1a1a1a' } }} />}
                                             label={
                                                 <Box>
-                                                    <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                                                    <Typography sx={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>
                                                         {addr.label || 'Address'}{addr.is_default ? ' (Default)' : ''}
                                                     </Typography>
-                                                    <Typography sx={{ fontSize: 13, color: '#666' }}>
+                                                    <Typography sx={{ fontSize: 13, color: '#888' }}>
                                                         {addr.street}, {addr.city}, {addr.country}
                                                     </Typography>
                                                 </Box>
@@ -141,12 +143,13 @@ export const CheckoutScreen: React.FC = () => {
                                             sx={{
                                                 mb: 1,
                                                 px: 2,
-                                                py: 1,
+                                                py: 1.5,
                                                 borderRadius: '12px',
-                                                border: selectedAddress === addr.id ? `2px solid ${COLOR_BRAND.accent}` : '1px solid #e8e8e8',
-                                                bgcolor: selectedAddress === addr.id ? 'rgba(232,255,71,0.05)' : 'transparent',
+                                                border: selectedAddress === addr.id ? '2px solid #1a1a1a' : '1px solid #f0f0f0',
+                                                bgcolor: selectedAddress === addr.id ? '#fafafa' : 'transparent',
                                                 mx: 0,
                                                 width: '100%',
+                                                transition: 'all 0.15s',
                                             }}
                                         />
                                     ))}
@@ -155,8 +158,8 @@ export const CheckoutScreen: React.FC = () => {
                         </Box>
 
                         {/* Discount */}
-                        <Box sx={{ bgcolor: '#fff', borderRadius: '20px', border: '1px solid #e8e8e8', p: 3 }}>
-                            <Typography sx={{ fontWeight: 700, fontSize: 18, mb: 2, color: COLOR_BRAND.dark }}>
+                        <Box sx={{ borderTop: '1px solid #f0f0f0', pt: 3 }}>
+                            <Typography sx={{ fontWeight: 700, fontSize: 16, mb: 2, color: '#1a1a1a' }}>
                                 Discount Code
                             </Typography>
                             <Box sx={{ display: 'flex', gap: 1 }}>
@@ -168,6 +171,7 @@ export const CheckoutScreen: React.FC = () => {
                                     sx={{
                                         flex: 1,
                                         '& .MuiOutlinedInput-root': { borderRadius: '10px' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e8e8e8' },
                                     }}
                                 />
                                 <VButton
@@ -180,7 +184,7 @@ export const CheckoutScreen: React.FC = () => {
                                 </VButton>
                             </Box>
                             {discountResult && (
-                                <Typography sx={{ mt: 1.5, fontSize: 13, color: '#4dff91', fontWeight: 600 }}>
+                                <Typography sx={{ mt: 1.5, fontSize: 13, color: '#2e7d32', fontWeight: 600 }}>
                                     Discount: -${Number(discountResult.discount_amount).toFixed(2)}
                                 </Typography>
                             )}
@@ -192,16 +196,15 @@ export const CheckoutScreen: React.FC = () => {
                         sx={{
                             width: { xs: '100%', md: 380 },
                             flexShrink: 0,
-                            bgcolor: '#fff',
+                            bgcolor: '#fafafa',
                             borderRadius: '20px',
-                            border: '1px solid #e8e8e8',
                             p: 3,
                             alignSelf: 'flex-start',
                             position: { md: 'sticky' },
-                            top: { md: 24 },
+                            top: { md: 88 },
                         }}
                     >
-                        <Typography sx={{ fontWeight: 700, fontSize: 18, mb: 2, color: COLOR_BRAND.dark }}>
+                        <Typography sx={{ fontWeight: 700, fontSize: 16, mb: 2, color: '#1a1a1a' }}>
                             Order Summary
                         </Typography>
 
@@ -210,7 +213,7 @@ export const CheckoutScreen: React.FC = () => {
                                 <Typography sx={{ fontSize: 13, color: '#555', flex: 1 }}>
                                     {item.product_name} x{item.quantity}
                                 </Typography>
-                                <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
+                                <Typography sx={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>
                                     ${Number(item.line_total).toFixed(2)}
                                 </Typography>
                             </Box>
@@ -218,13 +221,13 @@ export const CheckoutScreen: React.FC = () => {
 
                         <Box sx={{ borderTop: '1px solid #e8e8e8', mt: 2, pt: 2 }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                <Typography sx={{ color: '#666' }}>Subtotal</Typography>
-                                <Typography sx={{ fontWeight: 600 }}>${Number(checkoutData.subtotal).toFixed(2)}</Typography>
+                                <Typography sx={{ color: '#666', fontSize: 14 }}>Subtotal</Typography>
+                                <Typography sx={{ fontWeight: 600, fontSize: 14 }}>${Number(checkoutData.subtotal).toFixed(2)}</Typography>
                             </Box>
                             {discountResult && (
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                    <Typography sx={{ color: '#4dff91' }}>Discount</Typography>
-                                    <Typography sx={{ color: '#4dff91', fontWeight: 600 }}>
+                                    <Typography sx={{ color: '#2e7d32', fontSize: 14 }}>Discount</Typography>
+                                    <Typography sx={{ color: '#2e7d32', fontWeight: 600, fontSize: 14 }}>
                                         -${Number(discountResult.discount_amount).toFixed(2)}
                                     </Typography>
                                 </Box>
@@ -232,8 +235,8 @@ export const CheckoutScreen: React.FC = () => {
                         </Box>
 
                         <Box sx={{ borderTop: '1px solid #e8e8e8', mt: 2, pt: 2, display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                            <Typography sx={{ fontWeight: 700, fontSize: 20, color: COLOR_BRAND.dark }}>Total</Typography>
-                            <Typography sx={{ fontWeight: 800, fontSize: 24, color: COLOR_BRAND.dark }}>
+                            <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a' }}>Total</Typography>
+                            <Typography sx={{ fontWeight: 800, fontSize: 22, color: '#1a1a1a' }}>
                                 ${Number(finalTotal).toFixed(2)}
                             </Typography>
                         </Box>

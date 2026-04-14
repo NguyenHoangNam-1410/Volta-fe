@@ -6,9 +6,9 @@ import {
     Typography,
     CircularProgress,
 } from '@mui/material';
-import { COLOR_BRAND } from '../../../../common/constants/color.constant';
 import { useCart } from '../../../../common/contexts/cart.context';
 import { VButton } from '../../../../common/components';
+import { VBreadcrumb } from '../../../../common/components/VBreadcrumb';
 
 export const CartScreen: React.FC = () => {
     const navigate = useNavigate();
@@ -17,21 +17,23 @@ export const CartScreen: React.FC = () => {
     if (loading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-                <CircularProgress sx={{ color: COLOR_BRAND.dark }} />
+                <CircularProgress sx={{ color: '#1a1a1a' }} />
             </Box>
         );
     }
 
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: '#fafafa' }}>
+        <Box sx={{ bgcolor: '#ffffff' }}>
             <Container maxWidth="lg" sx={{ py: 4 }}>
+                <VBreadcrumb items={[{ label: 'Home', path: '/' }, { label: 'Cart' }]} />
+
                 <Typography
                     sx={{
                         fontFamily: '"Syne", sans-serif',
-                        fontSize: 32,
+                        fontSize: 28,
                         fontWeight: 800,
                         mb: 3,
-                        color: COLOR_BRAND.dark,
+                        color: '#1a1a1a',
                     }}
                 >
                     Your Cart
@@ -42,12 +44,11 @@ export const CartScreen: React.FC = () => {
                         sx={{
                             textAlign: 'center',
                             py: 8,
-                            bgcolor: '#fff',
                             borderRadius: '20px',
-                            border: '1px solid #e8e8e8',
+                            border: '1px solid #f0f0f0',
                         }}
                     >
-                        <Typography sx={{ color: '#888', mb: 2 }}>Your cart is empty</Typography>
+                        <Typography sx={{ color: '#999', mb: 2, fontSize: 15 }}>Your cart is empty</Typography>
                         <VButton variant="secondary" onClick={() => navigate('/shop')}>
                             Continue Shopping
                         </VButton>
@@ -56,18 +57,15 @@ export const CartScreen: React.FC = () => {
                     <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
                         {/* Items */}
                         <Box sx={{ flex: 1 }}>
-                            {cart.items.map((item) => (
+                            {cart.items.map((item, idx) => (
                                 <Box
                                     key={item.id}
                                     sx={{
                                         display: 'flex',
                                         gap: 2,
-                                        mb: 2,
-                                        bgcolor: '#fff',
-                                        borderRadius: '16px',
-                                        border: '1px solid #e8e8e8',
-                                        p: 2,
+                                        py: 2.5,
                                         alignItems: 'center',
+                                        borderBottom: idx < cart.items.length - 1 ? '1px solid #f0f0f0' : 'none',
                                     }}
                                 >
                                     <Box
@@ -75,12 +73,13 @@ export const CartScreen: React.FC = () => {
                                             width: 80,
                                             height: 80,
                                             borderRadius: '12px',
-                                            bgcolor: '#f5f5f5',
+                                            bgcolor: '#fafafa',
                                             flexShrink: 0,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             overflow: 'hidden',
+                                            border: '1px solid #f0f0f0',
                                         }}
                                     >
                                         {item.image_url ? (
@@ -91,62 +90,57 @@ export const CartScreen: React.FC = () => {
                                                 sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }}
                                             />
                                         ) : (
-                                            <Typography sx={{ fontSize: 10, color: '#bbb' }}>{item.product_name}</Typography>
+                                            <Typography sx={{ fontSize: 10, color: '#ccc' }}>{item.product_name}</Typography>
                                         )}
                                     </Box>
 
                                     <Box sx={{ flex: 1 }}>
                                         <Typography
                                             onClick={() => navigate(`/shop/${item.product_id}`)}
-                                            sx={{ fontWeight: 600, fontSize: 15, cursor: 'pointer', color: COLOR_BRAND.dark, '&:hover': { textDecoration: 'underline' } }}
+                                            sx={{ fontWeight: 600, fontSize: 14, cursor: 'pointer', color: '#1a1a1a', '&:hover': { textDecoration: 'underline' } }}
                                         >
                                             {item.product_name}
                                         </Typography>
-                                        <Typography sx={{ fontSize: 13, color: '#888' }}>
+                                        <Typography sx={{ fontSize: 13, color: '#999' }}>
                                             ${Number(item.product_price).toFixed(2)} each
                                         </Typography>
                                     </Box>
 
                                     {/* Qty stepper */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', border: '1px solid #e8e8e8', borderRadius: '8px', overflow: 'hidden' }}>
                                         <Box
                                             onClick={() => {
                                                 if (item.quantity > 1) {
                                                     updateQty({ product_id: item.product_id, quantity: item.quantity - 1 });
                                                 }
                                             }}
-                                            sx={{ width: 32, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', '&:hover': { bgcolor: '#f5f5f5' } }}
+                                            sx={{ width: 32, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#555', '&:hover': { bgcolor: '#f8f8f8' } }}
                                         >
                                             -
                                         </Box>
-                                        <Box sx={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 13, borderLeft: '1px solid #e0e0e0', borderRight: '1px solid #e0e0e0' }}>
+                                        <Box sx={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 13, borderLeft: '1px solid #e8e8e8', borderRight: '1px solid #e8e8e8' }}>
                                             {item.quantity}
                                         </Box>
                                         <Box
                                             onClick={() => updateQty({ product_id: item.product_id, quantity: item.quantity + 1 })}
-                                            sx={{ width: 32, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', '&:hover': { bgcolor: '#f5f5f5' } }}
+                                            sx={{ width: 32, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#555', '&:hover': { bgcolor: '#f8f8f8' } }}
                                         >
                                             +
                                         </Box>
                                     </Box>
 
-                                    <Typography sx={{ fontWeight: 700, fontSize: 16, minWidth: 80, textAlign: 'right', color: COLOR_BRAND.dark }}>
+                                    <Typography sx={{ fontWeight: 700, fontSize: 15, minWidth: 80, textAlign: 'right', color: '#1a1a1a' }}>
                                         ${Number(item.line_total).toFixed(2)}
                                     </Typography>
 
                                     <Box
                                         onClick={() => removeItem(item.product_id)}
                                         sx={{
-                                            width: 32,
-                                            height: 32,
-                                            borderRadius: '8px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            cursor: 'pointer',
-                                            color: '#999',
-                                            fontSize: 18,
-                                            '&:hover': { bgcolor: '#fee', color: '#ff4d4d' },
+                                            width: 32, height: 32, borderRadius: '8px',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            cursor: 'pointer', color: '#ccc', fontSize: 16,
+                                            transition: 'all 0.15s',
+                                            '&:hover': { bgcolor: '#fef2f2', color: '#ef4444' },
                                         }}
                                     >
                                         x
@@ -160,25 +154,24 @@ export const CartScreen: React.FC = () => {
                             sx={{
                                 width: { xs: '100%', md: 340 },
                                 flexShrink: 0,
-                                bgcolor: '#fff',
+                                bgcolor: '#fafafa',
                                 borderRadius: '20px',
-                                border: '1px solid #e8e8e8',
                                 p: 3,
                                 alignSelf: 'flex-start',
                                 position: { md: 'sticky' },
-                                top: { md: 24 },
+                                top: { md: 88 },
                             }}
                         >
-                            <Typography sx={{ fontWeight: 700, fontSize: 18, mb: 2, color: COLOR_BRAND.dark }}>
+                            <Typography sx={{ fontWeight: 700, fontSize: 18, mb: 2, color: '#1a1a1a' }}>
                                 Order Summary
                             </Typography>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                <Typography sx={{ color: '#666' }}>Items ({cart.count})</Typography>
-                                <Typography sx={{ fontWeight: 600 }}>${Number(cart.subtotal).toFixed(2)}</Typography>
+                                <Typography sx={{ color: '#666', fontSize: 14 }}>Items ({cart.count})</Typography>
+                                <Typography sx={{ fontWeight: 600, fontSize: 14 }}>${Number(cart.subtotal).toFixed(2)}</Typography>
                             </Box>
                             <Box sx={{ borderTop: '1px solid #e8e8e8', pt: 2, mt: 2, display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                                <Typography sx={{ fontWeight: 700, fontSize: 18, color: COLOR_BRAND.dark }}>Total</Typography>
-                                <Typography sx={{ fontWeight: 800, fontSize: 22, color: COLOR_BRAND.dark }}>
+                                <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a' }}>Total</Typography>
+                                <Typography sx={{ fontWeight: 800, fontSize: 22, color: '#1a1a1a' }}>
                                     ${Number(cart.subtotal).toFixed(2)}
                                 </Typography>
                             </Box>
