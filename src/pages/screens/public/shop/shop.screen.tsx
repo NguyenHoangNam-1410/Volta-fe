@@ -151,7 +151,7 @@ export const ShopScreen: React.FC = () => {
                             >
                                 All
                             </Box>
-                            {(categories ?? []).map((cat) => (
+                            {(Array.isArray(categories) ? categories : []).map((cat) => (
                                 <Box
                                     key={cat.id}
                                     onClick={() => setCategoryId(cat.id)}
