@@ -33,7 +33,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setLoading(true);
         try {
             const res = await getCart();
-            setCart(res.data);
+            const payload = (res as { data?: { data?: Cart } | Cart })?.data;
+            const normalizedCart = payload && typeof payload === 'object' && 'data' in payload
+                ? (payload.data ?? emptyCart)
+                : (payload as Cart | undefined) ?? emptyCart;
+            setCart({
+                items: Array.isArray(normalizedCart.items) ? normalizedCart.items : [],
+                subtotal: Number(normalizedCart.subtotal ?? 0),
+                count: Number(normalizedCart.count ?? 0),
+            });
         } catch {
             setCart(emptyCart);
         } finally {

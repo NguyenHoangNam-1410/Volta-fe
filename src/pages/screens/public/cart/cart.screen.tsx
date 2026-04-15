@@ -13,6 +13,7 @@ import { VBreadcrumb } from '../../../../common/components/VBreadcrumb';
 export const CartScreen: React.FC = () => {
     const navigate = useNavigate();
     const { cart, loading, updateQty, removeItem } = useCart();
+    const items = Array.isArray(cart?.items) ? cart.items : [];
 
     if (loading) {
         return (
@@ -39,7 +40,7 @@ export const CartScreen: React.FC = () => {
                     Your Cart
                 </Typography>
 
-                {cart.items.length === 0 ? (
+                {items.length === 0 ? (
                     <Box
                         sx={{
                             textAlign: 'center',
@@ -57,7 +58,7 @@ export const CartScreen: React.FC = () => {
                     <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
                         {/* Items */}
                         <Box sx={{ flex: 1 }}>
-                            {cart.items.map((item, idx) => (
+                            {items.map((item, idx) => (
                                 <Box
                                     key={item.id}
                                     sx={{
@@ -65,7 +66,7 @@ export const CartScreen: React.FC = () => {
                                         gap: 2,
                                         py: 2.5,
                                         alignItems: 'center',
-                                        borderBottom: idx < cart.items.length - 1 ? '1px solid #f0f0f0' : 'none',
+                                        borderBottom: idx < items.length - 1 ? '1px solid #f0f0f0' : 'none',
                                     }}
                                 >
                                     <Box
