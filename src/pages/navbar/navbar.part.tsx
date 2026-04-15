@@ -170,6 +170,7 @@ export const Navbar: React.FC = () => {
                         {authenticated ? (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                 <Box
+                                    onClick={() => navigate('/profile')}
                                     sx={{
                                         width: 34,
                                         height: 34,
@@ -181,20 +182,26 @@ export const Navbar: React.FC = () => {
                                         justifyContent: 'center',
                                         fontWeight: 700,
                                         fontSize: 13,
+                                        cursor: 'pointer',
+                                        transition: 'opacity 0.15s',
+                                        '&:hover': { opacity: 0.8 },
                                     }}
                                 >
                                     {(user?.full_name?.[0] ?? 'U').toUpperCase()}
                                 </Box>
-                                <Box
-                                    onClick={handleSignOut}
-                                    sx={{
-                                        fontSize: 13,
-                                        color: '#888',
-                                        cursor: 'pointer',
-                                        '&:hover': { color: COLOR_BRAND.dark },
-                                    }}
-                                >
-                                    Sign out
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                                    <Box
+                                        onClick={() => navigate('/profile')}
+                                        sx={{ fontSize: 13, fontWeight: 600, color: COLOR_BRAND.dark, cursor: 'pointer', lineHeight: 1.3, '&:hover': { textDecoration: 'underline' } }}
+                                    >
+                                        {user?.full_name?.split(' ')[0]}
+                                    </Box>
+                                    <Box
+                                        onClick={handleSignOut}
+                                        sx={{ fontSize: 11, color: '#aaa', cursor: 'pointer', '&:hover': { color: '#555' } }}
+                                    >
+                                        Sign out
+                                    </Box>
                                 </Box>
                             </Box>
                         ) : (

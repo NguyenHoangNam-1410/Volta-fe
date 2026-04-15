@@ -28,7 +28,10 @@ export const CategoriesTab: React.FC<{ search?: string }> = ({ search = '' }) =>
 
     const { data: categories, isLoading } = useSWR<Category[]>(
         SWR_KEY,
-        () => getAllCategories().then((r) => r.data),
+        () => getAllCategories().then((r) => {
+            const d = r.data as any;
+            return Array.isArray(d) ? d : (d?.data ?? []);
+        }),
     );
 
     const filtered = (categories ?? []).filter(

@@ -15,7 +15,7 @@ export const getShops = (params: ShopRequestParam): Promise<ApiResponse<ShopProd
     });
 }
 
-export const getShopProductById = (id: number): Promise<ApiResponse<ProductDetail[]>> => {
+export const getShopProductById = (id: string): Promise<ApiResponse<ProductDetail>> => {
     return axiosInstance.get(`/shop/products/${id}`);
 }
 

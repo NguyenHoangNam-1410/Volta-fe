@@ -6,10 +6,11 @@ export const ROUTES = {
 
     // Customer
     SHOP: '/shop',
-    PRODUCT_DETAIL: '/shop/:slug',
+    PRODUCT_DETAIL: '/shop/:id',
     CART: '/cart',
     CHECKOUT: '/checkout',
     ORDER_SUCCESS: '/order-success',
+    PROFILE: '/profile',
 } as const;
 
 export const ROUTE_LABELS = {
@@ -24,4 +25,5 @@ export const ROUTE_LABELS = {
     [ROUTES.CART]: 'Cart',
     [ROUTES.CHECKOUT]: 'Checkout',
     [ROUTES.ORDER_SUCCESS]: 'Order Success',
+    [ROUTES.PROFILE]: 'Profile',
 } as const;

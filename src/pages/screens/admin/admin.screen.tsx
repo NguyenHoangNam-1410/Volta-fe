@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography, InputBase } from '@mui/material';
+import { Navigate } from 'react-router-dom';
+import { getStoredUser, isAuthenticated } from '../../../common/utils/auth-session';
 import { COLOR_BRAND } from '../../../common/constants/color.constant';
 import { A } from './admin.constants';
 import { DashboardTab } from './dashboard/dashboard.tab';
@@ -46,6 +48,11 @@ export const AdminScreen: React.FC = () => {
     const [page, setPage] = useState<AdminPage>('dashboard');
     const [collapsed, setCollapsed] = useState(false);
     const [search, setSearch] = useState('');
+
+    const user = getStoredUser();
+    if (!isAuthenticated() || user?.id !== 1) {
+        return <Navigate to="/" replace />;
+    }
 
     return (
         <Box

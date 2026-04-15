@@ -6,6 +6,7 @@ import { VTable } from '../../../../common/components/VTable';
 import type { VTableColumn } from '../../../../common/components/VTable';
 import { VButton } from '../../../../common/components/VButton';
 import { ProductFormModal } from './product-form.modal';
+import { ManageProductImagesModal } from './manage-product-images.modal';
 import { useSnackbar } from '../../../../common/contexts/snackbar.context';
 import {
     getAllProduct, createProduct, updateProduct, deleteProduct,
@@ -36,6 +37,8 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editTarget, setEditTarget] = useState<Product | null>(null);
     const [submitting, setSubmitting] = useState(false);
+    const [imageModalOpen, setImageModalOpen] = useState(false);
+    const [imageTarget, setImageTarget] = useState<Product | null>(null);
 
     const swrKey = ['products', page, PAGE_SIZE, search, categoryFilter];
 
@@ -56,6 +59,11 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
     const handleAdd = () => {
         setEditTarget(null);
         setModalOpen(true);
+    };
+
+    const handleManageImages = (product: Product) => {
+        setImageTarget(product);
+        setImageModalOpen(true);
     };
 
     const handleEdit = (product: Product) => {
@@ -147,9 +155,10 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
             ),
         },
         {
-            key: 'actions', label: 'Actions', width: 100,
+            key: 'actions', label: 'Actions', width: 150,
             render: (r) => (
                 <Box sx={{ display: 'flex', gap: 0.75 }}>
+                    <VButton variant="ghost" size="small" onClick={() => handleManageImages(r)}>Images</VButton>
                     <VButton variant="ghost" size="small" onClick={() => handleEdit(r)}>Edit</VButton>
                     <VButton variant="danger" size="small" onClick={() => handleDelete(r)}>Del</VButton>
                 </Box>
@@ -223,6 +232,12 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
                 product={editTarget}
                 categories={categories}
                 loading={submitting}
+            />
+
+            <ManageProductImagesModal
+                open={imageModalOpen}
+                onClose={() => setImageModalOpen(false)}
+                product={imageTarget}
             />
         </Box>
     );

@@ -39,5 +39,7 @@ export interface DiscountApplyResponse {
 
 export interface PlaceOrderDto {
     address_id: number;
-    discount_code: string;
+    discount_code?: string;
+    payment_method: 'cod' | 'credit_card';
+    delivery_tier: 'standard' | 'express';
 }
