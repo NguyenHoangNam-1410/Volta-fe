@@ -191,7 +191,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                         <Box sx={{ '& label': { color: A.text } }}>
                             <VToggle
                                 label="Active"
-                                checked={formik.values.is_active}
+                                checked={!!formik.values.is_active}
                                 onChange={(v) => formik.setFieldValue('is_active', v)}
                             />
                         </Box>
