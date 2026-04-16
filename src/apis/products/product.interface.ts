@@ -10,8 +10,9 @@ export interface Product {
   price: number;
   stock: number;
   badge: ProductBadge;
-  is_active: boolean;
-  create_at: string;
+  is_active: boolean | number;
+  create_at?: string;
+  image_url?: string;
 }
 
 export interface RequestCreateProductDto {

@@ -2,14 +2,19 @@ import type { Address } from "../profiles/profile.interface";
 
 export interface CartItem {
   id: number;
-  product_id: number;
+    item_type?: 'product' | 'bundle';
+    item_id?: number;
+    product_id?: number;
+    bundle_id?: number;
   quantity: number;
-  product_name: string;
-  product_slug: string;
-  product_price: number;
-  product_stock: number;
-  image_url: string;
+    image_url?: string;
   line_total: number;
+    product_name?: string;
+    product_slug?: string;
+    product_price?: number;
+    product_stock?: number;
+    bundle_name?: string;
+    bundle_price?: number;
 }
 
 export interface Cart {
@@ -19,7 +24,9 @@ export interface Cart {
 }
 
 export interface RequestAddToCartDto {
-    product_id: number;
+    item_type?: 'product' | 'bundle';
+    product_id?: number;
+    bundle_id?: number;
     quantity: number;
 }
 

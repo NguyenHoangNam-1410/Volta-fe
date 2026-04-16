@@ -18,7 +18,6 @@ import { ProductBadge } from '../../../apis/products/product.enum';
 import type { Bundle } from '../../../apis/bundles/bundle.interface';
 import { VButton } from '../../../common/components';
 import { useCart } from '../../../common/contexts/cart.context';
-import { isAuthenticated } from '../../../common/utils/auth-session';
 
 const badgeVisual: Record<string, { text: string; bg: string }> = {
     hot: { text: '#e53935', bg: '#ffeaea' },
@@ -35,23 +34,58 @@ const sectionLabel: Record<string, string> = {
     [ProductBadge.NEW]: 'Just arrived',
 };
 
+const resolveProductImageUrl = (imageUrl?: string): string => {
+    if (!imageUrl) return '';
+    if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
+    const apiUrl = import.meta.env.VITE_API_URL as string | undefined;
+    const origin = apiUrl ? new URL(apiUrl, window.location.origin).origin : window.location.origin;
+    return `${origin}${imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`}`;
+};
+
+const extractArrayData = <T,>(payload: unknown): T[] => {
+    if (Array.isArray(payload)) return payload as T[];
+    const nested = (payload as { data?: unknown } | undefined)?.data;
+    return Array.isArray(nested) ? (nested as T[]) : [];
+};
+
 function HomeProductCard({ product, onNavigate, onAddToCart }: { product: Product; onNavigate: () => void; onAddToCart: () => void }) {
     const style = badgeVisual[product.badge] ?? badgeVisual.none;
+    const hasBadge = product.badge !== 'none';
+    const imageSrc = resolveProductImageUrl(product.image_url);
 
     return (
         <Box
             sx={{
                 bgcolor: '#ffffff',
                 borderRadius: '16px',
-                border: '1px solid #f0f0f0',
+                border: hasBadge ? `2px solid ${style.text}` : '1px solid #f0f0f0',
                 overflow: 'hidden',
-                transition: 'transform 0.2s, box-shadow 0.2s',
+                position: 'relative',
+                transition: 'transform 0.2s, box-shadow 0.2s, border 0.2s',
+                boxShadow: hasBadge ? `0 0 0 1px ${style.bg}` : 'none',
                 '&:hover': {
                     transform: 'translateY(-4px)',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                    boxShadow: hasBadge ? `0 8px 24px rgba(0,0,0,0.12), 0 0 0 1px ${style.bg}` : '0 8px 24px rgba(0,0,0,0.06)',
                 },
             }}
         >
+            {hasBadge && (
+                <Chip
+                    label={product.badge.toUpperCase()}
+                    size="small"
+                    sx={{
+                        bgcolor: style.bg,
+                        color: style.text,
+                        fontSize: 10,
+                        fontWeight: 700,
+                        height: 24,
+                        position: 'absolute',
+                        top: 8,
+                        right: 8,
+                        zIndex: 10,
+                    }}
+                />
+            )}
             <Box
                 onClick={onNavigate}
                 sx={{
@@ -61,25 +95,24 @@ function HomeProductCard({ product, onNavigate, onAddToCart }: { product: Produc
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
+                    overflow: 'hidden',
                 }}
             >
-                <Typography sx={{ color: '#ccc', fontSize: 13 }}>{product.name}</Typography>
-            </Box>
-            <Box sx={{ p: 2 }}>
-                {product.badge !== 'none' && (
-                    <Chip
-                        label={product.badge.toUpperCase()}
-                        size="small"
-                        sx={{
-                            bgcolor: style.bg,
-                            color: style.text,
-                            fontSize: 10,
-                            fontWeight: 700,
-                            mb: 1,
-                            height: 22,
+                {imageSrc ? (
+                    <Box
+                        component="img"
+                        src={imageSrc}
+                        alt={product.name}
+                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e) => {
+                            e.currentTarget.style.display = 'none';
                         }}
                     />
+                ) : (
+                    <Typography sx={{ color: '#ccc', fontSize: 13 }}>{product.name}</Typography>
                 )}
+            </Box>
+            <Box sx={{ p: 2 }}>
                 <Typography
                     onClick={onNavigate}
                     sx={{ fontWeight: 600, fontSize: 14, color: '#1a1a1a', mb: 0.5, cursor: 'pointer', lineHeight: 1.4 }}
@@ -108,7 +141,7 @@ function HomeProductCard({ product, onNavigate, onAddToCart }: { product: Produc
     );
 }
 
-function BundleCard({ bundle }: { bundle: Bundle }) {
+function BundleCard({ bundle, onAddToCart }: { bundle: Bundle; onAddToCart: () => void }) {
     return (
         <Box
             sx={{
@@ -130,9 +163,19 @@ function BundleCard({ bundle }: { bundle: Bundle }) {
                     {bundle.description || 'Curated bundle for best value.'}
                 </Typography>
             </Box>
-            <Typography sx={{ mt: 1.5, color: COLOR_BRAND.accent, fontWeight: 800, fontSize: 22 }}>
-                ${Number(bundle.bundle_price).toFixed(2)}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2 }}>
+                <Typography sx={{ color: COLOR_BRAND.accent, fontWeight: 800, fontSize: 22 }}>
+                    ${Number(bundle.bundle_price).toFixed(2)}
+                </Typography>
+                <VButton
+                    variant="secondary"
+                    size="small"
+                    onClick={onAddToCart}
+                    sx={{ borderRadius: '8px', fontSize: 12 }}
+                >
+                    Add
+                </VButton>
+            </Box>
         </Box>
     );
 }
@@ -151,22 +194,22 @@ export const HomeScreen: React.FC = () => {
 
     const { data: hotProducts, isLoading: hotLoading } = useSWR<Product[]>(
         ['featured', ProductBadge.HOT],
-        () => getFeaturedProducts({ badge: ProductBadge.HOT, limit: 4 }).then((res) => res.data),
+        () => getFeaturedProducts({ badge: ProductBadge.HOT, limit: 4 }).then((res) => extractArrayData<Product>(res.data)),
     );
 
     const { data: saleProducts, isLoading: saleLoading } = useSWR<Product[]>(
         ['featured', ProductBadge.SALE],
-        () => getFeaturedProducts({ badge: ProductBadge.SALE, limit: 4 }).then((res) => res.data),
+        () => getFeaturedProducts({ badge: ProductBadge.SALE, limit: 4 }).then((res) => extractArrayData<Product>(res.data)),
     );
 
     const { data: newProducts, isLoading: newLoading } = useSWR<Product[]>(
         ['featured', ProductBadge.NEW],
-        () => getFeaturedProducts({ badge: ProductBadge.NEW, limit: 4 }).then((res) => res.data),
+        () => getFeaturedProducts({ badge: ProductBadge.NEW, limit: 4 }).then((res) => extractArrayData<Product>(res.data)),
     );
 
     const { data: bundles, isLoading: bundleLoading } = useSWR<Bundle[]>(
         ['bundles-active'],
-        () => getActiveBundles().then((res) => res.data),
+        () => getActiveBundles().then((res) => extractArrayData<Bundle>(res.data)),
     );
 
     const { data: availableProducts, isLoading: availableLoading } = useSWR<Product[]>(
@@ -201,11 +244,11 @@ export const HomeScreen: React.FC = () => {
     };
 
     const handleAddToCart = async (product: Product) => {
-        if (!isAuthenticated()) {
-            navigate('/login');
-            return;
-        }
         await addToCart({ product_id: product.id, quantity: 1 });
+    };
+
+    const handleAddBundleToCart = async (bundle: Bundle) => {
+        await addToCart({ item_type: 'bundle', bundle_id: bundle.id, quantity: 1 });
     };
 
     return (
@@ -346,7 +389,11 @@ export const HomeScreen: React.FC = () => {
                     ) : (bundles ?? []).length > 0 ? (
                         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', xl: 'repeat(3, 1fr)' }, gap: 2 }}>
                             {(bundles ?? []).map((bundle) => (
-                                <BundleCard key={`bundle-${bundle.id}`} bundle={bundle} />
+                                <BundleCard 
+                                    key={`bundle-${bundle.id}`} 
+                                    bundle={bundle}
+                                    onAddToCart={() => handleAddBundleToCart(bundle)}
+                                />
                             ))}
                         </Box>
                     ) : (

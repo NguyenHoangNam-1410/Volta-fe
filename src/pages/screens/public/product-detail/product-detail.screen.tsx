@@ -16,7 +16,6 @@ import { ProductRelationType } from '../../../../apis/products/product.enum';
 import { VButton } from '../../../../common/components';
 import { VBreadcrumb } from '../../../../common/components/VBreadcrumb';
 import { useCart } from '../../../../common/contexts/cart.context';
-import { isAuthenticated } from '../../../../common/utils/auth-session';
 
 const badgeVisual: Record<string, { text: string; bg: string }> = {
     hot: { text: '#e53935', bg: '#ffeaea' },
@@ -49,10 +48,6 @@ export const ProductDetailScreen: React.FC = () => {
     );
 
     const handleAddToCart = async () => {
-        if (!isAuthenticated()) {
-            navigate('/login');
-            return;
-        }
         if (!detail?.product) return;
         await addToCart({ product_id: detail.product.id, quantity: qty });
     };
@@ -148,7 +143,7 @@ export const ProductDetailScreen: React.FC = () => {
 
                     {/* Info */}
                     <Box sx={{ flex: 1 }}>
-                        {product.badge !== 'none' && (
+                        {product.badge && product.badge !== 'none' && (
                             <Chip
                                 label={product.badge.toUpperCase()}
                                 size="small"
@@ -286,30 +281,55 @@ export const ProductDetailScreen: React.FC = () => {
                                 gap: 2,
                             }}
                         >
-                            {(relatedProducts ?? []).map((rp) => (
-                                <Box
-                                    key={rp.id}
-                                    onClick={() => navigate(`/shop/${rp.id}`)}
-                                    sx={{
-                                        borderRadius: '16px',
-                                        border: '1px solid #f0f0f0',
-                                        p: 2.5,
-                                        cursor: 'pointer',
-                                        transition: 'transform 0.2s, box-shadow 0.2s',
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
-                                        },
-                                    }}
-                                >
-                                    <Typography sx={{ fontWeight: 600, fontSize: 14, mb: 0.5, color: '#1a1a1a' }}>
-                                        {rp.name}
-                                    </Typography>
-                                    <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a' }}>
-                                        ${Number(rp.price).toFixed(2)}
-                                    </Typography>
-                                </Box>
-                            ))}
+                            {(relatedProducts ?? []).map((rp) => {
+                                const rpStyle = badgeVisual[rp.badge] ?? badgeVisual.none;
+                                const rpHasBadge = rp.badge && rp.badge !== 'none';
+                                return (
+                                    <Box
+                                        key={rp.id}
+                                        onClick={() => navigate(`/shop/${rp.id}`)}
+                                        sx={{
+                                            borderRadius: '16px',
+                                            border: rpHasBadge ? `2px solid ${rpStyle.text}` : '1px solid #f0f0f0',
+                                            p: 2.5,
+                                            cursor: 'pointer',
+                                            position: 'relative',
+                                            transition: 'transform 0.2s, box-shadow 0.2s, border 0.2s',
+                                            boxShadow: rpHasBadge ? `0 0 0 1px ${rpStyle.bg}` : 'none',
+                                            '&:hover': {
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: rpHasBadge
+                                                    ? `0 4px 16px rgba(0,0,0,0.08), 0 0 0 1px ${rpStyle.bg}`
+                                                    : '0 4px 16px rgba(0,0,0,0.04)',
+                                            },
+                                        }}
+                                    >
+                                        {rpHasBadge && (
+                                            <Chip
+                                                label={rp.badge.toUpperCase()}
+                                                size="small"
+                                                sx={{
+                                                    bgcolor: rpStyle.bg,
+                                                    color: rpStyle.text,
+                                                    fontSize: 9,
+                                                    fontWeight: 700,
+                                                    height: 20,
+                                                    position: 'absolute',
+                                                    top: 8,
+                                                    right: 8,
+                                                    zIndex: 10,
+                                                }}
+                                            />
+                                        )}
+                                        <Typography sx={{ fontWeight: 600, fontSize: 14, mb: 0.5, color: '#1a1a1a' }}>
+                                            {rp.name}
+                                        </Typography>
+                                        <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a' }}>
+                                            ${rp.price ? Number(rp.price).toFixed(2) : 'N/A'}
+                                        </Typography>
+                                    </Box>
+                                );
+                            })}
                         </Box>
                     </Box>
                 )}

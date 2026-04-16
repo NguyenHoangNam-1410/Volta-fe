@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useCallback, useState, useEffect } from 'react';
-import { isAuthenticated } from '../utils/auth-session';
 import { getCart, addProductToCart, updateCartItem, deleteCartItem, deleteCart } from '../../apis/carts/cart.api';
 import type { Cart, RequestAddToCartDto } from '../../apis/carts/cart.interface';
 
@@ -8,7 +7,7 @@ interface CartContextType {
     loading: boolean;
     addToCart: (dto: RequestAddToCartDto) => Promise<void>;
     updateQty: (dto: RequestAddToCartDto) => Promise<void>;
-    removeItem: (productId: number) => Promise<void>;
+    removeItem: (itemId: number, itemType?: 'product' | 'bundle') => Promise<void>;
     clearCart: () => Promise<void>;
     refreshCart: () => Promise<void>;
 }
@@ -26,10 +25,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     const [loading, setLoading] = useState(false);
 
     const refreshCart = useCallback(async () => {
-        if (!isAuthenticated()) {
-            setCart(emptyCart);
-            return;
-        }
         setLoading(true);
         try {
             const res = await getCart();
@@ -63,8 +58,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         await refreshCart();
     }, [refreshCart]);
 
-    const removeItem = useCallback(async (productId: number) => {
-        await deleteCartItem(productId);
+    const removeItem = useCallback(async (itemId: number, itemType?: 'product' | 'bundle') => {
+        await deleteCartItem(itemId, itemType);
         await refreshCart();
     }, [refreshCart]);
 

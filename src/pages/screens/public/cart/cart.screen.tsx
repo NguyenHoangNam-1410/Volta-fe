@@ -15,6 +15,16 @@ export const CartScreen: React.FC = () => {
     const { cart, loading, updateQty, removeItem } = useCart();
     const items = Array.isArray(cart?.items) ? cart.items : [];
 
+    const getLineLabel = (item: typeof items[number]): string => item.bundle_name ?? item.product_name ?? 'Item';
+
+    const getLineUnitPrice = (item: typeof items[number]): number => Number(item.bundle_price ?? item.product_price ?? 0);
+
+    const getLineHref = (item: typeof items[number]): string | null => {
+        if (item.item_type === 'bundle') return null;
+        if (typeof item.product_id === 'number') return `/shop/${item.product_id}`;
+        return null;
+    };
+
     if (loading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
@@ -87,23 +97,29 @@ export const CartScreen: React.FC = () => {
                                             <Box
                                                 component="img"
                                                 src={item.image_url}
-                                                alt={item.product_name}
+                                                alt={getLineLabel(item)}
                                                 sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }}
                                             />
                                         ) : (
-                                            <Typography sx={{ fontSize: 10, color: '#ccc' }}>{item.product_name}</Typography>
+                                            <Typography sx={{ fontSize: 10, color: '#ccc' }}>{getLineLabel(item)}</Typography>
                                         )}
                                     </Box>
 
                                     <Box sx={{ flex: 1 }}>
-                                        <Typography
-                                            onClick={() => navigate(`/shop/${item.product_id}`)}
-                                            sx={{ fontWeight: 600, fontSize: 14, cursor: 'pointer', color: '#1a1a1a', '&:hover': { textDecoration: 'underline' } }}
-                                        >
-                                            {item.product_name}
-                                        </Typography>
+                                        {getLineHref(item) ? (
+                                            <Typography
+                                                onClick={() => navigate(getLineHref(item) as string)}
+                                                sx={{ fontWeight: 600, fontSize: 14, cursor: 'pointer', color: '#1a1a1a', '&:hover': { textDecoration: 'underline' } }}
+                                            >
+                                                {getLineLabel(item)}
+                                            </Typography>
+                                        ) : (
+                                            <Typography sx={{ fontWeight: 600, fontSize: 14, color: '#1a1a1a' }}>
+                                                {getLineLabel(item)}
+                                            </Typography>
+                                        )}
                                         <Typography sx={{ fontSize: 13, color: '#999' }}>
-                                            ${Number(item.product_price).toFixed(2)} each
+                                            ${getLineUnitPrice(item).toFixed(2)} each
                                         </Typography>
                                     </Box>
 
@@ -112,7 +128,9 @@ export const CartScreen: React.FC = () => {
                                         <Box
                                             onClick={() => {
                                                 if (item.quantity > 1) {
-                                                    updateQty({ product_id: item.product_id, quantity: item.quantity - 1 });
+                                                    updateQty(item.item_type === 'bundle'
+                                                        ? { item_type: 'bundle', bundle_id: item.bundle_id, quantity: item.quantity - 1 }
+                                                        : { item_type: 'product', product_id: item.product_id, quantity: item.quantity - 1 });
                                                 }
                                             }}
                                             sx={{ width: 32, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#555', '&:hover': { bgcolor: '#f8f8f8' } }}
@@ -123,7 +141,9 @@ export const CartScreen: React.FC = () => {
                                             {item.quantity}
                                         </Box>
                                         <Box
-                                            onClick={() => updateQty({ product_id: item.product_id, quantity: item.quantity + 1 })}
+                                            onClick={() => updateQty(item.item_type === 'bundle'
+                                                ? { item_type: 'bundle', bundle_id: item.bundle_id, quantity: item.quantity + 1 }
+                                                : { item_type: 'product', product_id: item.product_id, quantity: item.quantity + 1 })}
                                             sx={{ width: 32, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#555', '&:hover': { bgcolor: '#f8f8f8' } }}
                                         >
                                             +
@@ -135,7 +155,7 @@ export const CartScreen: React.FC = () => {
                                     </Typography>
 
                                     <Box
-                                        onClick={() => removeItem(item.product_id)}
+                                        onClick={() => removeItem(item.item_id ?? item.id, item.item_type)}
                                         sx={{
                                             width: 32, height: 32, borderRadius: '8px',
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',

@@ -18,8 +18,10 @@ export const updateCartItem = (body: RequestAddToCartDto): Promise<ApiResponse<O
     return axiosInstance.put('/cart/items', body);
 };
 
-export const deleteCartItem = (product_id: number): Promise<ApiResponse<Omit<Cart, 'items'>>> => {
-    return axiosInstance.delete(`/cart/items/${product_id}`);
+export const deleteCartItem = (itemId: number, itemType?: 'product' | 'bundle'): Promise<ApiResponse<Omit<Cart, 'items'>>> => {
+    return axiosInstance.delete(`/cart/items/${itemId}`, {
+        params: itemType === 'bundle' ? { item_type: 'bundle' } : undefined,
+    });
 };
 
 export const checkoutCart = (): Promise<ApiResponse<CheckOutCartResponse>> => {

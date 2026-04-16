@@ -1,4 +1,5 @@
 import type { BaseRequestParam } from "../../common/interfaces/base-requestdto.interface";
+import type { Product } from "../products/product.interface";
 
 export interface Bundle {
   id: number;
@@ -6,6 +7,7 @@ export interface Bundle {
   description: string;
   bundle_price: number;
   is_active: boolean;
+  items: Product[];
 }
 
 export interface RequestCreateBundleDto {

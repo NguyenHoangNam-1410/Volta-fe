@@ -30,10 +30,17 @@ export const ManageProductImagesModal: React.FC<ManageProductImagesModalProps> =
 
     const { data: imagesResp, mutate, isLoading } = useSWR<ProductImage[]>(
         product && open ? ['product-images', product.id] : null,
-        () => getAllProductImage(String(product!.id)).then((res) => res.data),
+        () => getAllProductImage(String(product!.id)).then((res) => {
+            const payload = res.data;
+            // Handle nested data structure
+            if (payload && typeof payload === 'object' && 'data' in payload) {
+                return (payload as any).data ?? [];
+            }
+            return Array.isArray(payload) ? payload : [];
+        }),
     );
 
-    const images = imagesResp ?? [];
+    const images = Array.isArray(imagesResp) ? imagesResp : [];
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || e.target.files.length === 0 || !product) return;

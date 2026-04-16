@@ -18,13 +18,20 @@ import type { Category } from '../../../../apis/categories/category.interface';
 import { VButton } from '../../../../common/components';
 import { VBreadcrumb } from '../../../../common/components/VBreadcrumb';
 import { useCart } from '../../../../common/contexts/cart.context';
-import { isAuthenticated } from '../../../../common/utils/auth-session';
 
 const badgeVisual: Record<string, { text: string; bg: string }> = {
     hot: { text: '#e53935', bg: '#ffeaea' },
     sale: { text: '#e65100', bg: '#fff3e0' },
     new: { text: '#1565c0', bg: '#e3f2fd' },
     none: { text: '#888', bg: '#f5f5f5' },
+};
+
+const resolveProductImageUrl = (imageUrl?: string): string => {
+    if (!imageUrl) return '';
+    if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
+    const apiUrl = import.meta.env.VITE_API_URL as string | undefined;
+    const origin = apiUrl ? new URL(apiUrl, window.location.origin).origin : window.location.origin;
+    return `${origin}${imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`}`;
 };
 
 export const ShopScreen: React.FC = () => {
@@ -38,7 +45,7 @@ export const ShopScreen: React.FC = () => {
 
     const { data: categories } = useSWR<Category[]>(
         'shop-categories',
-        () => getShopCategories().then((r) => r.data),
+        () => getShopCategories().then((r) => (r as unknown as { data: { data: Category[] } }).data.data),
     );
 
     const { data: shopRes, isLoading } = useSWR(
@@ -72,10 +79,6 @@ export const ShopScreen: React.FC = () => {
     });
 
     const handleAddToCart = async (product: Product) => {
-        if (!isAuthenticated()) {
-            navigate('/login');
-            return;
-        }
         await addToCart({ product_id: product.id, quantity: 1 });
     };
 
@@ -221,21 +224,42 @@ export const ShopScreen: React.FC = () => {
                                 >
                                     {sorted.map((product) => {
                                         const style = badgeVisual[product.badge] ?? badgeVisual.none;
+                                        const hasBadge = product.badge !== 'none';
+                                        const imageSrc = resolveProductImageUrl(product.image_url);
                                         return (
                                             <Box
                                                 key={product.id}
                                                 sx={{
                                                     bgcolor: '#ffffff',
                                                     borderRadius: '16px',
-                                                    border: '1px solid #f0f0f0',
+                                                    border: hasBadge ? `2px solid ${style.text}` : '1px solid #f0f0f0',
                                                     overflow: 'hidden',
-                                                    transition: 'transform 0.2s, box-shadow 0.2s',
+                                                    position: 'relative',
+                                                    transition: 'transform 0.2s, box-shadow 0.2s, border 0.2s',
+                                                    boxShadow: hasBadge ? `0 0 0 1px ${style.bg}` : 'none',
                                                     '&:hover': {
                                                         transform: 'translateY(-4px)',
-                                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                                                        boxShadow: hasBadge ? `0 8px 24px rgba(0,0,0,0.12), 0 0 0 1px ${style.bg}` : '0 8px 24px rgba(0,0,0,0.06)',
                                                     },
                                                 }}
                                             >
+                                                {hasBadge && (
+                                                    <Chip
+                                                        label={product.badge.toUpperCase()}
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: style.bg,
+                                                            color: style.text,
+                                                            fontSize: 10,
+                                                            fontWeight: 700,
+                                                            height: 24,
+                                                            position: 'absolute',
+                                                            top: 8,
+                                                            right: 8,
+                                                            zIndex: 10,
+                                                        }}
+                                                    />
+                                                )}
                                                 <Box
                                                     onClick={() => navigate(`/shop/${product.id}`)}
                                                     sx={{
@@ -245,27 +269,26 @@ export const ShopScreen: React.FC = () => {
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
                                                         cursor: 'pointer',
+                                                        overflow: 'hidden',
                                                     }}
                                                 >
-                                                    <Typography sx={{ color: '#ccc', fontSize: 13 }}>
-                                                        {product.name}
-                                                    </Typography>
-                                                </Box>
-                                                <Box sx={{ p: 2 }}>
-                                                    {product.badge !== 'none' && (
-                                                        <Chip
-                                                            label={product.badge.toUpperCase()}
-                                                            size="small"
-                                                            sx={{
-                                                                bgcolor: style.bg,
-                                                                color: style.text,
-                                                                fontSize: 10,
-                                                                fontWeight: 700,
-                                                                mb: 1,
-                                                                height: 22,
+                                                    {imageSrc ? (
+                                                        <Box
+                                                            component="img"
+                                                            src={imageSrc}
+                                                            alt={product.name}
+                                                            sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                            onError={(e) => {
+                                                                e.currentTarget.style.display = 'none';
                                                             }}
                                                         />
+                                                    ) : (
+                                                        <Typography sx={{ color: '#ccc', fontSize: 13 }}>
+                                                            {product.name}
+                                                        </Typography>
                                                     )}
+                                                </Box>
+                                                <Box sx={{ p: 2 }}>
                                                     <Typography
                                                         onClick={() => navigate(`/shop/${product.id}`)}
                                                         sx={{ fontWeight: 600, fontSize: 14, color: '#1a1a1a', mb: 0.5, cursor: 'pointer' }}
