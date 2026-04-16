@@ -27,6 +27,7 @@ axiosInstance.interceptors.request.use(
 // Optional: Add response interceptor for error handling
 axiosInstance.interceptors.response.use(
   (response) => {
+    console.log('API response', response);
     return response;
   },
   (error) => {
