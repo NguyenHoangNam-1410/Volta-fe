@@ -103,7 +103,7 @@ export const RegisterScreen: React.FC = () => {
     };
 
     return (
-        <Box sx={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, bgcolor: COLOR_BRAND.dark }}>
+        <Box sx={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, bgcolor: COLOR_BRAND.bg }}>
             <Box
                 sx={{
                     bgcolor: COLOR_BRAND.dark,
@@ -123,6 +123,17 @@ export const RegisterScreen: React.FC = () => {
                         background: COLOR_BRAND.accent,
                         borderRadius: '50%',
                         opacity: 0.06,
+                    },
+                    '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: -100,
+                        left: -60,
+                        width: 300,
+                        height: 300,
+                        background: COLOR_BRAND.accent,
+                        borderRadius: '50%',
+                        opacity: 0.04,
                     },
                 }}
             >
@@ -172,7 +183,7 @@ export const RegisterScreen: React.FC = () => {
                             fontSize: 32,
                             fontWeight: 800,
                             letterSpacing: '-1px',
-                            color: '#fff',
+                            color: COLOR_BRAND.dark,
                             mb: 1,
                         }}
                     >
@@ -261,21 +272,28 @@ export const RegisterScreen: React.FC = () => {
                                 fullWidth
                                 disableElevation
                                 sx={{
-                                    bgcolor: COLOR_BRAND.accent,
-                                    color: COLOR_BRAND.dark,
+                                    bgcolor: COLOR_BRAND.dark,
+                                    color: COLOR_BRAND.accent,
                                     borderRadius: 50,
-                                    py: 1.5,
+                                    py: 1.75,
                                     fontFamily: "'Lato', sans-serif",
                                     fontSize: 15,
-                                    fontWeight: 600,
+                                    fontWeight: 500,
                                     textTransform: 'none',
-                                    mt: 0.5,
+                                    mt: 1,
                                     '&:hover': {
-                                        bgcolor: '#d5ea35',
+                                        bgcolor: '#1a1a1a',
+                                        transform: 'translateY(-2px)',
+                                    },
+                                    transition: 'transform 0.2s cubic-bezier(0.22,1,0.36,1), background 0.2s',
+                                    '&.Mui-disabled': {
+                                        bgcolor: COLOR_BRAND.dark,
+                                        color: COLOR_BRAND.accent,
+                                        opacity: 0.6,
                                     },
                                 }}
                             >
-                                {loading ? <CircularProgress size={22} sx={{ color: COLOR_BRAND.dark }} /> : 'Register'}
+                                {loading ? <CircularProgress size={22} sx={{ color: COLOR_BRAND.accent }} /> : 'Register'}
                             </Button>
                         </Box>
                     </form>
@@ -286,16 +304,16 @@ export const RegisterScreen: React.FC = () => {
                         sx={{
                             mt: 1.5,
                             bgcolor: 'transparent',
-                            color: '#fff',
-                            border: '1.5px solid #444',
+                            color: COLOR_BRAND.dark,
+                            border: `1.5px solid ${COLOR_BRAND.dark}`,
                             borderRadius: 50,
-                            py: 1.25,
+                            py: 1.5,
                             fontFamily: "'Lato', sans-serif",
-                            fontSize: 14,
+                            fontSize: 15,
+                            fontWeight: 500,
                             textTransform: 'none',
                             '&:hover': {
-                                borderColor: '#fff',
-                                bgcolor: 'rgba(255,255,255,0.08)',
+                                bgcolor: 'rgba(26,26,26,0.04)',
                             },
                         }}
                     >
