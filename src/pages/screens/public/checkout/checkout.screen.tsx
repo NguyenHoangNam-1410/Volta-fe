@@ -835,7 +835,8 @@ export const CheckoutScreen: React.FC = () => {
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
                 <Typography sx={{ fontSize: 13, color: "#555", flex: 1 }}>
-                  {item.bundle_name ?? item.product_name ?? "Item"} x{item.quantity}
+                  {item.bundle_name ?? item.product_name ?? "Item"} x
+                  {item.quantity}
                 </Typography>
                 <Typography
                   sx={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}

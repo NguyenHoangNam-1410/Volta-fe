@@ -72,7 +72,7 @@ export interface OrderStat {
 }
 
 export interface EffectiveFilter {
-  mode: 'last_n_days' | 'custom_range';
+  mode: "last_n_days" | "custom_range";
   start_date: string;
   end_date: string;
   days?: number;
@@ -100,7 +100,7 @@ export interface TopProductStat {
   sold_quantity: number;
 }
 
-export interface CustomerOrder extends Omit<Order, 'items'> {
+export interface CustomerOrder extends Omit<Order, "items"> {
   address_id: number;
 }
 

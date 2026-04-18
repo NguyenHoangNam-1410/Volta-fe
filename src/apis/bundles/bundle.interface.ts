@@ -6,6 +6,8 @@ export interface Bundle {
   name: string;
   description: string;
   bundle_price: number;
+  total_product_price?: number;
+  off_percentage?: number;
   is_active: boolean;
   items: Product[];
 }
@@ -23,6 +25,5 @@ export interface BundleItem {
   bundle_id: number;
   product_id: number;
 }
-
 
 export type BundleRequestParam = BaseRequestParam;

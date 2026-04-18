@@ -4,7 +4,13 @@ import dayjs from "dayjs";
 
 export const DAYS_OPTIONS = [7, 14, 30] as const;
 export const ROW_OPTIONS = [10, 20, 50] as const;
-export const STATUS_LIST = ["pending", "paid", "shipped", "delivered", "cancelled"] as const;
+export const STATUS_LIST = [
+  "pending",
+  "paid",
+  "shipped",
+  "delivered",
+  "cancelled",
+] as const;
 
 // ── Styling ─────────────────────────────────────────────────────────────────
 
@@ -114,8 +120,8 @@ export function processRevenueChartData(statsResp: any) {
       : statsResp?.revenue_last_7_days) ?? [];
 
   const weekBars = revenueSeries.map((p: any) => Number(p.amount ?? 0));
-  const weekLabels = revenueSeries.map((p: any) =>
-    p.day_of_week?.slice(0, 3) ?? dayjs(p.date).format("dd"),
+  const weekLabels = revenueSeries.map(
+    (p: any) => p.day_of_week?.slice(0, 3) ?? dayjs(p.date).format("dd"),
   );
   const weekTooltips = revenueSeries.map(
     (p: any) =>

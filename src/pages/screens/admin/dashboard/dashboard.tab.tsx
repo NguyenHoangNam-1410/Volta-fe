@@ -41,9 +41,10 @@ const BarChart: React.FC<{
   tooltips?: string[];
 }> = ({ values, labels, tooltips }) => {
   const max = Math.max(...values, 1);
-  const barWidth = 34;
-  const gap = 6;
-  const contentWidth = Math.max(420, values.length * (barWidth + gap));
+  const isSparseData = values.length <= 17;
+  const fixedBarWidth = 34;
+  const gap = isSparseData ? 10 : 6;
+  const contentWidth = Math.max(420, values.length * (fixedBarWidth + gap));
 
   return (
     <Box
@@ -69,19 +70,21 @@ const BarChart: React.FC<{
     >
       <Box
         sx={{
-          display: "flex",
-          alignItems: "flex-end",
+          display: "grid",
+          gridTemplateColumns: isSparseData
+            ? `repeat(${Math.max(values.length, 1)}, minmax(0, 1fr))`
+            : `repeat(${values.length}, ${fixedBarWidth}px)`,
+          alignItems: "end",
           gap: `${gap}px`,
-          height: 120,
-          minWidth: `${contentWidth}px`,
-          width: "max-content",
+          height: 140,
+          minWidth: isSparseData ? "100%" : `${contentWidth}px`,
+          width: isSparseData ? "100%" : "max-content",
         }}
       >
         {values.map((v, i) => (
           <Box
             key={i}
             sx={{
-              width: `${barWidth}px`,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -96,7 +99,7 @@ const BarChart: React.FC<{
               <Box
                 sx={{
                   width: "100%",
-                  height: `${(v / max) * 100}px`,
+                  height: `${(v / max) * 110}px`,
                   bgcolor: ADMIN_COLOR.accent,
                   borderRadius: "4px 4px 0 0",
                   transition: "height 0.6s ease",
@@ -124,7 +127,11 @@ const getOrderColumns = (): VTableColumn<RecentOrderStat>[] => [
     width: 60,
     render: (r) => (
       <Typography
-        sx={{ fontSize: 13, color: ADMIN_COLOR.accent, fontFamily: "monospace" }}
+        sx={{
+          fontSize: 13,
+          color: ADMIN_COLOR.accent,
+          fontFamily: "monospace",
+        }}
       >
         #{r.order_id}
       </Typography>
@@ -134,14 +141,18 @@ const getOrderColumns = (): VTableColumn<RecentOrderStat>[] => [
     key: "customer",
     label: "Customer",
     render: (r) => (
-      <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.text }}>{r.customer}</Typography>
+      <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.text }}>
+        {r.customer}
+      </Typography>
     ),
   },
   {
     key: "total",
     label: "Total",
     render: (r) => (
-      <Typography sx={{ fontFamily: "monospace", fontSize: 13, color: ADMIN_COLOR.text }}>
+      <Typography
+        sx={{ fontFamily: "monospace", fontSize: 13, color: ADMIN_COLOR.text }}
+      >
         ${Number(r.total).toFixed(2)}
       </Typography>
     ),
@@ -199,7 +210,9 @@ const getProductColumns = (): VTableColumn<TopProductStat>[] => [
     label: "Product",
     render: (r) => (
       <Box>
-        <Typography sx={{ fontSize: 13, fontWeight: 500, color: ADMIN_COLOR.text }}>
+        <Typography
+          sx={{ fontSize: 13, fontWeight: 500, color: ADMIN_COLOR.text }}
+        >
           {r.product}
         </Typography>
         <Typography
@@ -214,7 +227,9 @@ const getProductColumns = (): VTableColumn<TopProductStat>[] => [
     key: "price",
     label: "Price",
     render: (r) => (
-      <Typography sx={{ fontFamily: "monospace", fontSize: 13, color: ADMIN_COLOR.text }}>
+      <Typography
+        sx={{ fontFamily: "monospace", fontSize: 13, color: ADMIN_COLOR.text }}
+      >
         ${Number(r.price).toFixed(2)}
       </Typography>
     ),
@@ -232,7 +247,12 @@ const getProductColumns = (): VTableColumn<TopProductStat>[] => [
     key: "stock",
     label: "Stock",
     render: (r) => (
-      <Typography sx={{ fontSize: 13, color: r.stock < 10 ? ADMIN_COLOR.red : ADMIN_COLOR.dim }}>
+      <Typography
+        sx={{
+          fontSize: 13,
+          color: r.stock < 10 ? ADMIN_COLOR.red : ADMIN_COLOR.dim,
+        }}
+      >
         {r.stock}
       </Typography>
     ),

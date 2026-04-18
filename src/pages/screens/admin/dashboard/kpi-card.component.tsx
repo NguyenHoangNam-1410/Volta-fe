@@ -58,7 +58,9 @@ export const KpiCard: React.FC<KpiCardProps> = ({
       {value}
     </Typography>
     {change && (
-      <Typography sx={{ fontSize: 12, color: up ? ADMIN_COLOR.green : ADMIN_COLOR.red }}>
+      <Typography
+        sx={{ fontSize: 12, color: up ? ADMIN_COLOR.green : ADMIN_COLOR.red }}
+      >
         {up ? "↑" : "↓"} {change}
       </Typography>
     )}

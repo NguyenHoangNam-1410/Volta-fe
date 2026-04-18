@@ -1,10 +1,10 @@
-import axios from 'axios';
+import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   withCredentials: true,
 });
@@ -21,20 +21,20 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Optional: Add response interceptor for error handling
 axiosInstance.interceptors.response.use(
   (response) => {
-    console.log('API response', response);
+    console.log("API response", response);
     return response;
   },
   (error) => {
     // Handle errors globally
-    console.error('API Error:', error);
+    console.error("API Error:", error);
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosInstance;

@@ -1,4 +1,4 @@
-import type { User } from '../users/user.interface';
+import type { User } from "../users/user.interface";
 
 export interface RequestLoginDto {
   email: string;
