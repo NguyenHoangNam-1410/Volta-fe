@@ -28,6 +28,14 @@ export interface OrderRequestParam extends BaseRequestParam {
   status?: OrderStatus;
 }
 
+export interface OrderStatsRequestParam {
+  start_date?: string;
+  end_date?: string;
+  days?: number;
+  recent_limit?: number;
+  top_limit?: number;
+}
+
 export interface CreateOrderResponse {
   user_id: number;
   address_id: number;
@@ -55,6 +63,41 @@ export interface OrderStat {
   total_revenue: number;
   completed_orders: number;
   cancelled_orders: number;
+  effective_filter?: EffectiveFilter;
+  revenue_window_days?: number;
+  revenue_by_day?: RevenueByDayPoint[];
+  revenue_last_7_days?: RevenueByDayPoint[];
+  recent_orders?: RecentOrderStat[];
+  top_products?: TopProductStat[];
+}
+
+export interface EffectiveFilter {
+  mode: 'last_n_days' | 'custom_range';
+  start_date: string;
+  end_date: string;
+  days?: number;
+}
+
+export interface RevenueByDayPoint {
+  date: string;
+  day_of_week: string;
+  amount: number;
+}
+
+export interface RecentOrderStat {
+  order_id: number;
+  customer: string;
+  total: number;
+  status: OrderStatus;
+  date: string;
+}
+
+export interface TopProductStat {
+  product_id: number;
+  product: string;
+  price: number;
+  stock: number;
+  sold_quantity: number;
 }
 
 export interface CustomerOrder extends Omit<Order, 'items'> {

@@ -10,7 +10,7 @@ import {
     TextField,
     Chip,
 } from '@mui/material';
-import { A } from '../admin.constants';
+import { ADMIN_COLOR } from '../admin.constants';
 import { VTable, VButton, VToggle } from '../../../../common/components';
 import type { VTableColumn } from '../../../../common/components/VTable';
 import {
@@ -143,7 +143,7 @@ export const BundlesTab: React.FC<{ search?: string }> = ({ search = '' }) => {
             label: 'Price',
             width: 100,
             render: (row) => (
-                <Typography sx={{ color: A.accent, fontWeight: 700, fontSize: 13 }}>
+                <Typography sx={{ color: ADMIN_COLOR.accent, fontWeight: 700, fontSize: 13 }}>
                     ${Number(row.bundle_price).toFixed(2)}
                 </Typography>
             ),
@@ -187,23 +187,23 @@ export const BundlesTab: React.FC<{ search?: string }> = ({ search = '' }) => {
     ];
 
     const dialogSx = {
-        bgcolor: A.surface,
-        color: A.text,
-        border: `1px solid ${A.border}`,
+        bgcolor: ADMIN_COLOR.surface,
+        color: ADMIN_COLOR.text,
+        border: `1px solid ${ADMIN_COLOR.border}`,
         borderRadius: '16px',
     };
 
     const fieldSx = {
         mb: 2,
-        '& .MuiInputBase-root': { color: A.text },
-        '& .MuiInputLabel-root': { color: A.dim },
-        '& .MuiOutlinedInput-notchedOutline': { borderColor: A.border },
+        '& .MuiInputBase-root': { color: ADMIN_COLOR.text },
+        '& .MuiInputLabel-root': { color: ADMIN_COLOR.dim },
+        '& .MuiOutlinedInput-notchedOutline': { borderColor: ADMIN_COLOR.border },
     };
 
     return (
         <Box sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography sx={{ color: A.dim, fontSize: 13 }}>
+                <Typography sx={{ color: ADMIN_COLOR.dim, fontSize: 13 }}>
                     {bundles.length} bundles
                 </Typography>
                 <VButton variant="secondary" size="small" onClick={openCreate}>
@@ -212,14 +212,14 @@ export const BundlesTab: React.FC<{ search?: string }> = ({ search = '' }) => {
             </Box>
 
             {isLoading ? (
-                <Typography sx={{ color: A.dim }}>Loading...</Typography>
+                <Typography sx={{ color: ADMIN_COLOR.dim }}>Loading...</Typography>
             ) : (
                 <VTable columns={columns} data={bundles} />
             )}
 
             {/* Create/Edit dialog */}
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: dialogSx }}>
-                <DialogTitle sx={{ color: A.text }}>{editing ? 'Edit Bundle' : 'New Bundle'}</DialogTitle>
+                <DialogTitle sx={{ color: ADMIN_COLOR.text }}>{editing ? 'Edit Bundle' : 'New Bundle'}</DialogTitle>
                 <DialogContent>
                     <TextField
                         label="Name"
@@ -246,7 +246,7 @@ export const BundlesTab: React.FC<{ search?: string }> = ({ search = '' }) => {
                         sx={fieldSx}
                     />
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1 }}>
-                        <Typography sx={{ color: A.dim, fontSize: 13 }}>Active</Typography>
+                        <Typography sx={{ color: ADMIN_COLOR.dim, fontSize: 13 }}>Active</Typography>
                         <VToggle checked={form.is_active} onChange={(v) => setForm({ ...form, is_active: v })} />
                     </Box>
                 </DialogContent>
@@ -258,9 +258,9 @@ export const BundlesTab: React.FC<{ search?: string }> = ({ search = '' }) => {
 
             {/* Delete confirm */}
             <Dialog open={deleteDialogId !== null} onClose={() => setDeleteDialogId(null)} maxWidth="xs" PaperProps={{ sx: dialogSx }}>
-                <DialogTitle sx={{ color: A.text }}>Delete Bundle</DialogTitle>
+                <DialogTitle sx={{ color: ADMIN_COLOR.text }}>Delete Bundle</DialogTitle>
                 <DialogContent>
-                    <Typography sx={{ color: A.dim }}>Are you sure? This action cannot be undone.</Typography>
+                    <Typography sx={{ color: ADMIN_COLOR.dim }}>Are you sure? This action cannot be undone.</Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
                     <VButton variant="ghost" onClick={() => setDeleteDialogId(null)}>Cancel</VButton>
@@ -270,12 +270,12 @@ export const BundlesTab: React.FC<{ search?: string }> = ({ search = '' }) => {
 
             {/* Bundle items dialog */}
             <Dialog open={detailBundle !== null} onClose={() => setDetailBundle(null)} maxWidth="sm" fullWidth PaperProps={{ sx: dialogSx }}>
-                <DialogTitle sx={{ color: A.text }}>
+                <DialogTitle sx={{ color: ADMIN_COLOR.text }}>
                     Bundle Items — {detailBundle?.name}
                 </DialogTitle>
                 <DialogContent>
                     {bundleItems.length === 0 ? (
-                        <Typography sx={{ color: A.dim, fontSize: 13 }}>No items in this bundle.</Typography>
+                        <Typography sx={{ color: ADMIN_COLOR.dim, fontSize: 13 }}>No items in this bundle.</Typography>
                     ) : (
                         <Box sx={{ mb: 2 }}>
                             {bundleItems.map((item) => (
@@ -286,10 +286,10 @@ export const BundlesTab: React.FC<{ search?: string }> = ({ search = '' }) => {
                                         justifyContent: 'space-between',
                                         alignItems: 'center',
                                         py: 1,
-                                        borderBottom: `1px solid ${A.border}`,
+                                        borderBottom: `1px solid ${ADMIN_COLOR.border}`,
                                     }}
                                 >
-                                    <Typography sx={{ fontSize: 13, color: A.text }}>
+                                    <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.text }}>
                                         {getProductName(item.product_id)}
                                     </Typography>
                                     <VButton variant="danger" size="small" onClick={() => handleRemoveItem(item.id)}>

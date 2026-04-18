@@ -4,7 +4,7 @@ import {
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { A } from '../admin.constants';
+import { ADMIN_COLOR } from '../admin.constants';
 import { VButton } from '../../../../common/components/VButton';
 import { VTextField } from '../../../../common/components/VTextField';
 import { VToggle } from '../../../../common/components/VToggle';
@@ -79,14 +79,14 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
     const darkFieldSx = {
         '& .MuiOutlinedInput-root': {
-            color: A.text,
-            bgcolor: A.bg,
-            '& fieldset': { borderColor: A.border },
-            '&:hover fieldset': { borderColor: A.border },
-            '&.Mui-focused fieldset': { borderColor: A.accent },
+            color: ADMIN_COLOR.text,
+            bgcolor: ADMIN_COLOR.bg,
+            '& fieldset': { borderColor: ADMIN_COLOR.border },
+            '&:hover fieldset': { borderColor: ADMIN_COLOR.border },
+            '&.Mui-focused fieldset': { borderColor: ADMIN_COLOR.accent },
         },
-        '& .MuiInputLabel-root': { color: A.dim },
-        '& .MuiInputLabel-root.Mui-focused': { color: A.text },
+        '& .MuiInputLabel-root': { color: ADMIN_COLOR.dim },
+        '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_COLOR.text },
     };
 
     return (
@@ -98,8 +98,8 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                     width: { xs: '95vw', sm: 540 },
                     maxHeight: '90vh',
                     overflowY: 'auto',
-                    bgcolor: A.surface,
-                    border: `1px solid ${A.border}`,
+                    bgcolor: ADMIN_COLOR.surface,
+                    border: `1px solid ${ADMIN_COLOR.border}`,
                     borderRadius: '12px',
                     p: 3,
                     outline: 'none',
@@ -108,13 +108,13 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 {/* Header */}
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                     <Typography
-                        sx={{ fontFamily: "'Syne', sans-serif", fontSize: 18, fontWeight: 800, color: A.text }}
+                        sx={{ fontFamily: "'Syne', sans-serif", fontSize: 18, fontWeight: 800, color: ADMIN_COLOR.text }}
                     >
                         {isEdit ? 'Edit Product' : 'Add Product'}
                     </Typography>
-                    <IconButton onClick={onClose} size="small" sx={{ color: A.dim }}>✕</IconButton>
+                    <IconButton onClick={onClose} size="small" sx={{ color: ADMIN_COLOR.dim }}>✕</IconButton>
                 </Box>
-                <Divider sx={{ borderColor: A.border, mb: 2.5 }} />
+                <Divider sx={{ borderColor: ADMIN_COLOR.border, mb: 2.5 }} />
 
                 <form onSubmit={formik.handleSubmit}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -188,7 +188,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                             sx={darkFieldSx}
                         />
 
-                        <Box sx={{ '& label': { color: A.text } }}>
+                        <Box sx={{ '& label': { color: ADMIN_COLOR.text } }}>
                             <VToggle
                                 label="Active"
                                 checked={!!formik.values.is_active}
@@ -196,7 +196,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                             />
                         </Box>
 
-                        <Divider sx={{ borderColor: A.border }} />
+                        <Divider sx={{ borderColor: ADMIN_COLOR.border }} />
 
                         <Box sx={{ display: 'flex', gap: 1.5, justifyContent: 'flex-end' }}>
                             <VButton variant="ghost" onClick={onClose} type="button">

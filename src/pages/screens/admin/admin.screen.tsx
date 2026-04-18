@@ -3,7 +3,7 @@ import { Box, Typography, InputBase } from '@mui/material';
 import { Navigate } from 'react-router-dom';
 import { getStoredUser, isAuthenticated } from '../../../common/utils/auth-session';
 import { COLOR_BRAND } from '../../../common/constants/color.constant';
-import { A } from './admin.constants';
+import { ADMIN_COLOR } from './admin.constants';
 import { DashboardTab } from './dashboard/dashboard.tab';
 import { OrdersTab } from './orders/orders.tab';
 import { DiscountsTab } from './discounts/discounts.tab';
@@ -59,9 +59,9 @@ export const AdminScreen: React.FC = () => {
             sx={{
                 display: 'flex',
                 height: '100vh',
-                bgcolor: A.bg,
+                bgcolor: ADMIN_COLOR.bg,
                 overflow: 'hidden',
-                color: A.text,
+                color: ADMIN_COLOR.text,
                 fontFamily: "'DM Sans', sans-serif",
             }}
         >
@@ -70,8 +70,8 @@ export const AdminScreen: React.FC = () => {
                 sx={{
                     width: collapsed ? 60 : 220,
                     flexShrink: 0,
-                    bgcolor: A.surface,
-                    borderRight: `1px solid ${A.border}`,
+                    bgcolor: ADMIN_COLOR.surface,
+                    borderRight: `1px solid ${ADMIN_COLOR.border}`,
                     display: 'flex',
                     flexDirection: 'column',
                     transition: 'width 0.3s ease',
@@ -85,7 +85,7 @@ export const AdminScreen: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         px: 2.25,
-                        borderBottom: `1px solid ${A.border}`,
+                        borderBottom: `1px solid ${ADMIN_COLOR.border}`,
                         gap: 1.25,
                         flexShrink: 0,
                     }}
@@ -110,7 +110,7 @@ export const AdminScreen: React.FC = () => {
                                 fontWeight: 800,
                                 fontSize: 16,
                                 letterSpacing: 1,
-                                color: A.text,
+                                color: ADMIN_COLOR.text,
                                 whiteSpace: 'nowrap',
                             }}
                         >
@@ -129,7 +129,7 @@ export const AdminScreen: React.FC = () => {
                                         fontSize: 10,
                                         textTransform: 'uppercase',
                                         letterSpacing: 1.5,
-                                        color: A.mid,
+                                        color: ADMIN_COLOR.mid,
                                         px: 1.25,
                                         mt: 2,
                                         mb: 0.75,
@@ -154,9 +154,9 @@ export const AdminScreen: React.FC = () => {
                                         borderRadius: '8px',
                                         cursor: 'pointer',
                                         bgcolor: page === item.id ? COLOR_BRAND.accent : 'transparent',
-                                        color: page === item.id ? COLOR_BRAND.dark : A.dim,
+                                        color: page === item.id ? COLOR_BRAND.dark : ADMIN_COLOR.dim,
                                         '&:hover': page !== item.id
-                                            ? { bgcolor: A.s2, color: A.text }
+                                            ? { bgcolor: ADMIN_COLOR.s2, color: ADMIN_COLOR.text }
                                             : {},
                                         transition: 'background 0.15s, color 0.15s',
                                         whiteSpace: 'nowrap',
@@ -178,7 +178,7 @@ export const AdminScreen: React.FC = () => {
                 </Box>
 
                 {/* Footer */}
-                <Box sx={{ p: 1, borderTop: `1px solid ${A.border}` }}>
+                <Box sx={{ p: 1, borderTop: `1px solid ${ADMIN_COLOR.border}` }}>
                     <Box
                         sx={{
                             display: 'flex',
@@ -187,7 +187,7 @@ export const AdminScreen: React.FC = () => {
                             px: 1.25, py: 1,
                             borderRadius: '8px',
                             cursor: 'pointer',
-                            '&:hover': { bgcolor: A.s2 },
+                            '&:hover': { bgcolor: ADMIN_COLOR.s2 },
                         }}
                     >
                         <Box
@@ -205,10 +205,10 @@ export const AdminScreen: React.FC = () => {
                         </Box>
                         {!collapsed && (
                             <Box sx={{ overflow: 'hidden' }}>
-                                <Typography sx={{ fontSize: 13, fontWeight: 500, color: A.text, whiteSpace: 'nowrap' }}>
+                                <Typography sx={{ fontSize: 13, fontWeight: 500, color: ADMIN_COLOR.text, whiteSpace: 'nowrap' }}>
                                     Volta Admin
                                 </Typography>
-                                <Typography sx={{ fontSize: 11, color: A.dim }}>Administrator</Typography>
+                                <Typography sx={{ fontSize: 11, color: ADMIN_COLOR.dim }}>Administrator</Typography>
                             </Box>
                         )}
                     </Box>
@@ -222,8 +222,8 @@ export const AdminScreen: React.FC = () => {
                     sx={{
                         height: 56,
                         flexShrink: 0,
-                        bgcolor: A.surface,
-                        borderBottom: `1px solid ${A.border}`,
+                        bgcolor: ADMIN_COLOR.surface,
+                        borderBottom: `1px solid ${ADMIN_COLOR.border}`,
                         display: 'flex',
                         alignItems: 'center',
                         px: 3,
@@ -235,13 +235,13 @@ export const AdminScreen: React.FC = () => {
                         sx={{
                             width: 30, height: 30,
                             borderRadius: '6px',
-                            border: `1px solid ${A.border}`,
-                            color: A.dim,
+                            border: `1px solid ${ADMIN_COLOR.border}`,
+                            color: ADMIN_COLOR.dim,
                             cursor: 'pointer',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             fontSize: 12,
                             userSelect: 'none',
-                            '&:hover': { bgcolor: A.s2, color: A.text },
+                            '&:hover': { bgcolor: ADMIN_COLOR.s2, color: ADMIN_COLOR.text },
                         }}
                     >
                         {collapsed ? '▶' : '◀'}
@@ -252,7 +252,7 @@ export const AdminScreen: React.FC = () => {
                             fontFamily: "'Syne', sans-serif",
                             fontSize: 16,
                             fontWeight: 700,
-                            color: A.text,
+                            color: ADMIN_COLOR.text,
                             flex: 1,
                         }}
                     >
@@ -264,31 +264,31 @@ export const AdminScreen: React.FC = () => {
                             display: 'flex',
                             alignItems: 'center',
                             gap: 1,
-                            bgcolor: A.s2,
-                            border: `1px solid ${A.border}`,
+                            bgcolor: ADMIN_COLOR.s2,
+                            border: `1px solid ${ADMIN_COLOR.border}`,
                             borderRadius: '8px',
                             px: 1.75,
                             py: 0.875,
                             width: 240,
                         }}
                     >
-                        <Typography sx={{ color: A.mid, fontSize: 13 }}>🔍</Typography>
+                        <Typography sx={{ color: ADMIN_COLOR.mid, fontSize: 13 }}>🔍</Typography>
                         <InputBase
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search..."
                             sx={{
                                 fontSize: 13,
-                                color: A.text,
+                                color: ADMIN_COLOR.text,
                                 flex: 1,
-                                '& input::placeholder': { color: A.mid },
+                                '& input::placeholder': { color: ADMIN_COLOR.mid },
                             }}
                         />
                     </Box>
                 </Box>
 
                 {/* Content */}
-                <Box sx={{ flex: 1, overflowY: 'auto', bgcolor: A.bg }}>
+                <Box sx={{ flex: 1, overflowY: 'auto', bgcolor: ADMIN_COLOR.bg }}>
                     {page === 'dashboard'  && <DashboardTab />}
                     {page === 'products'   && <ProductsTab search={search} />}
                     {page === 'orders'     && <OrdersTab search={search} />}

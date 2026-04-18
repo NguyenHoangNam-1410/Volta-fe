@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useSWR from 'swr';
 import { Box, Typography } from '@mui/material';
-import { A } from '../admin.constants';
+import { ADMIN_COLOR } from '../admin.constants';
 import { VTable } from '../../../../common/components/VTable';
 import type { VTableColumn } from '../../../../common/components/VTable';
 import { VAvatar } from '../../../../common/components/VAvatar';
@@ -31,7 +31,7 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ search }) => {
     const total = usersResp?.meta?.total ?? usersResp?.pagination?.total ?? 0;
     const totalPages = Math.ceil(total / PAGE_SIZE);
 
-    const avatarColors = [A.accent, A.blue, A.green, A.orange, A.red];
+    const avatarColors = [ADMIN_COLOR.accent, ADMIN_COLOR.blue, ADMIN_COLOR.green, ADMIN_COLOR.orange, ADMIN_COLOR.red];
     const getColor = (id: number) => avatarColors[id % avatarColors.length];
 
     const columns: VTableColumn<User>[] = [
@@ -48,13 +48,13 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ search }) => {
         {
             key: 'email', label: 'Email',
             render: (r) => (
-                <Typography sx={{ fontSize: 13, color: A.dim }}>{r.email}</Typography>
+                <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.dim }}>{r.email}</Typography>
             ),
         },
         {
             key: 'phone', label: 'Phone', width: 150,
             render: (r) => (
-                <Typography sx={{ fontFamily: 'monospace', fontSize: 12, color: A.dim }}>
+                <Typography sx={{ fontFamily: 'monospace', fontSize: 12, color: ADMIN_COLOR.dim }}>
                     {r.phone || '—'}
                 </Typography>
             ),
@@ -66,7 +66,7 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ search }) => {
                     sx={{
                         display: 'inline-flex', alignItems: 'center',
                         bgcolor: r.role === 'admin' ? 'rgba(232,255,71,0.12)' : 'rgba(136,136,136,0.12)',
-                        color: r.role === 'admin' ? A.accent : A.dim,
+                        color: r.role === 'admin' ? ADMIN_COLOR.accent : ADMIN_COLOR.dim,
                         fontSize: 11, fontWeight: 600,
                         px: 1.25, py: 0.375, borderRadius: '50px',
                         textTransform: 'capitalize',
@@ -79,7 +79,7 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ search }) => {
         {
             key: 'create_at', label: 'Joined', width: 130,
             render: (r) => (
-                <Typography sx={{ fontSize: 12, color: A.dim }}>
+                <Typography sx={{ fontSize: 12, color: ADMIN_COLOR.dim }}>
                     {r.create_at ? dayjs(r.create_at).format('MMM YYYY') : '—'}
                 </Typography>
             ),
@@ -90,10 +90,10 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ search }) => {
         <Box sx={{ p: 3.5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                 <Box>
-                    <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color: A.text, letterSpacing: -0.5 }}>
+                    <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color: ADMIN_COLOR.text, letterSpacing: -0.5 }}>
                         Customers
                     </Typography>
-                    <Typography sx={{ fontSize: 13, color: A.dim, mt: 0.25 }}>
+                    <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.dim, mt: 0.25 }}>
                         {total} total users
                     </Typography>
                 </Box>
@@ -106,7 +106,7 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ search }) => {
                     <VButton variant="ghost" size="small" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
                         ← Prev
                     </VButton>
-                    <Typography sx={{ fontSize: 12, color: A.dim }}>
+                    <Typography sx={{ fontSize: 12, color: ADMIN_COLOR.dim }}>
                         {page} / {totalPages}
                     </Typography>
                     <VButton variant="ghost" size="small" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>

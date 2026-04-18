@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useSWR from 'swr';
 import { Box, Typography, Chip } from '@mui/material';
-import { A } from '../admin.constants';
+import { ADMIN_COLOR } from '../admin.constants';
 import { VTable } from '../../../../common/components/VTable';
 import type { VTableColumn } from '../../../../common/components/VTable';
 import { VButton } from '../../../../common/components/VButton';
@@ -106,8 +106,8 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
             key: 'name', label: 'Product',
             render: (r) => (
                 <Box>
-                    <Typography sx={{ fontSize: 13, fontWeight: 500, color: A.text }}>{r.name}</Typography>
-                    <Typography sx={{ fontSize: 11, color: A.dim, fontFamily: 'monospace' }}>{r.slug}</Typography>
+                    <Typography sx={{ fontSize: 13, fontWeight: 500, color: ADMIN_COLOR.text }}>{r.name}</Typography>
+                    <Typography sx={{ fontSize: 11, color: ADMIN_COLOR.dim, fontFamily: 'monospace' }}>{r.slug}</Typography>
                 </Box>
             ),
         },
@@ -115,13 +115,13 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
             key: 'category_id', label: 'Category',
             render: (r) => {
                 const cat = categories.find((c) => c.id === r.category_id);
-                return <Typography sx={{ fontSize: 13, color: A.dim }}>{cat?.name ?? `#${r.category_id}`}</Typography>;
+                return <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.dim }}>{cat?.name ?? `#${r.category_id}`}</Typography>;
             },
         },
         {
             key: 'price', label: 'Price', width: 100,
             render: (r) => (
-                <Typography sx={{ fontFamily: 'monospace', fontSize: 13, color: A.text }}>
+                <Typography sx={{ fontFamily: 'monospace', fontSize: 13, color: ADMIN_COLOR.text }}>
                     ${Number(r.price).toFixed(2)}
                 </Typography>
             ),
@@ -129,7 +129,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
         {
             key: 'stock', label: 'Stock', width: 80,
             render: (r) => (
-                <Typography sx={{ fontSize: 13, color: r.stock < 10 ? A.red : A.green, fontWeight: 600 }}>
+                <Typography sx={{ fontSize: 13, color: r.stock < 10 ? ADMIN_COLOR.red : ADMIN_COLOR.green, fontWeight: 600 }}>
                     {r.stock}
                 </Typography>
             ),
@@ -137,7 +137,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
         {
             key: 'badge', label: 'Badge', width: 80,
             render: (r) => {
-                if (!r.badge || r.badge === ProductBadge.NONE) return <Typography sx={{ fontSize: 12, color: A.dim }}>—</Typography>;
+                if (!r.badge || r.badge === ProductBadge.NONE) return <Typography sx={{ fontSize: 12, color: ADMIN_COLOR.dim }}>—</Typography>;
                 const c = BADGE_COLORS[r.badge] ?? BADGE_COLORS[ProductBadge.NONE];
                 return (
                     <Box sx={{ display: 'inline-flex', alignItems: 'center', bgcolor: c.bg, color: c.text, fontSize: 11, fontWeight: 600, px: 1.25, py: 0.375, borderRadius: '50px' }}>
@@ -149,7 +149,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
         {
             key: 'is_active', label: 'Status', width: 80,
             render: (r) => (
-                <Box sx={{ display: 'inline-flex', alignItems: 'center', bgcolor: r.is_active ? 'rgba(77,255,145,0.12)' : 'rgba(255,77,77,0.12)', color: r.is_active ? A.green : A.red, fontSize: 11, fontWeight: 600, px: 1.25, py: 0.375, borderRadius: '50px' }}>
+                <Box sx={{ display: 'inline-flex', alignItems: 'center', bgcolor: r.is_active ? 'rgba(77,255,145,0.12)' : 'rgba(255,77,77,0.12)', color: r.is_active ? ADMIN_COLOR.green : ADMIN_COLOR.red, fontSize: 11, fontWeight: 600, px: 1.25, py: 0.375, borderRadius: '50px' }}>
                     {r.is_active ? 'Active' : 'Inactive'}
                 </Box>
             ),
@@ -172,7 +172,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
         <Box sx={{ p: 3.5 }}>
             {/* Header */}
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color: A.text, letterSpacing: -0.5 }}>
+                <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color: ADMIN_COLOR.text, letterSpacing: -0.5 }}>
                     Products
                 </Typography>
                 <VButton variant="secondary" onClick={handleAdd}>+ Add Product</VButton>
@@ -184,11 +184,11 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
                     label={`All (${total})`}
                     onClick={() => { setCategoryFilter(null); setPage(1); }}
                     sx={{
-                        bgcolor: categoryFilter === null ? A.accent : A.s2,
-                        color: categoryFilter === null ? A.accentDark : A.dim,
-                        border: `1px solid ${categoryFilter === null ? A.accent : A.border}`,
+                        bgcolor: categoryFilter === null ? ADMIN_COLOR.accent : ADMIN_COLOR.s2,
+                        color: categoryFilter === null ? ADMIN_COLOR.accentDark : ADMIN_COLOR.dim,
+                        border: `1px solid ${categoryFilter === null ? ADMIN_COLOR.accent : ADMIN_COLOR.border}`,
                         fontSize: 12, fontWeight: 500, cursor: 'pointer',
-                        '&:hover': { bgcolor: categoryFilter === null ? A.accent : A.muted },
+                        '&:hover': { bgcolor: categoryFilter === null ? ADMIN_COLOR.accent : ADMIN_COLOR.muted },
                     }}
                 />
                 {categories.map((cat) => (
@@ -197,11 +197,11 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
                         label={cat.name}
                         onClick={() => { setCategoryFilter(cat.id); setPage(1); }}
                         sx={{
-                            bgcolor: categoryFilter === cat.id ? A.accent : A.s2,
-                            color: categoryFilter === cat.id ? A.accentDark : A.dim,
-                            border: `1px solid ${categoryFilter === cat.id ? A.accent : A.border}`,
+                            bgcolor: categoryFilter === cat.id ? ADMIN_COLOR.accent : ADMIN_COLOR.s2,
+                            color: categoryFilter === cat.id ? ADMIN_COLOR.accentDark : ADMIN_COLOR.dim,
+                            border: `1px solid ${categoryFilter === cat.id ? ADMIN_COLOR.accent : ADMIN_COLOR.border}`,
                             fontSize: 12, fontWeight: 500, cursor: 'pointer',
-                            '&:hover': { bgcolor: categoryFilter === cat.id ? A.accent : A.muted },
+                            '&:hover': { bgcolor: categoryFilter === cat.id ? ADMIN_COLOR.accent : ADMIN_COLOR.muted },
                         }}
                     />
                 ))}
@@ -216,7 +216,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
                     <VButton variant="ghost" size="small" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
                         ← Prev
                     </VButton>
-                    <Typography sx={{ fontSize: 12, color: A.dim }}>
+                    <Typography sx={{ fontSize: 12, color: ADMIN_COLOR.dim }}>
                         {page} / {totalPages}
                     </Typography>
                     <VButton variant="ghost" size="small" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>

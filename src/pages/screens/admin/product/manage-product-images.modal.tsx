@@ -3,7 +3,7 @@ import {
     Modal, Box, Typography, IconButton, Divider, CircularProgress,
 } from '@mui/material';
 import useSWR from 'swr';
-import { A } from '../admin.constants';
+import { ADMIN_COLOR } from '../admin.constants';
 import { VButton } from '../../../../common/components/VButton';
 import type { Product, ProductImage } from '../../../../apis/products/product.interface';
 import {
@@ -101,8 +101,8 @@ export const ManageProductImagesModal: React.FC<ManageProductImagesModalProps> =
                     maxHeight: '90vh',
                     display: 'flex',
                     flexDirection: 'column',
-                    bgcolor: A.surface,
-                    border: `1px solid ${A.border}`,
+                    bgcolor: ADMIN_COLOR.surface,
+                    border: `1px solid ${ADMIN_COLOR.border}`,
                     borderRadius: '12px',
                     p: 3,
                     outline: 'none',
@@ -111,16 +111,16 @@ export const ManageProductImagesModal: React.FC<ManageProductImagesModalProps> =
                 {/* Header */}
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                     <Box>
-                        <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 18, fontWeight: 800, color: A.text }}>
+                        <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 18, fontWeight: 800, color: ADMIN_COLOR.text }}>
                             Manage Images
                         </Typography>
-                        <Typography sx={{ fontSize: 13, color: A.dim }}>
+                        <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.dim }}>
                             {product.name}
                         </Typography>
                     </Box>
-                    <IconButton onClick={onClose} size="small" sx={{ color: A.dim }}>✕</IconButton>
+                    <IconButton onClick={onClose} size="small" sx={{ color: ADMIN_COLOR.dim }}>✕</IconButton>
                 </Box>
-                <Divider sx={{ borderColor: A.border, mb: 3 }} />
+                <Divider sx={{ borderColor: ADMIN_COLOR.border, mb: 3 }} />
 
                 {/* Upload Action */}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 3 }}>
@@ -145,11 +145,11 @@ export const ManageProductImagesModal: React.FC<ManageProductImagesModalProps> =
                 <Box sx={{ flex: 1, overflowY: 'auto', minHeight: 200 }}>
                     {isLoading ? (
                         <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-                            <CircularProgress sx={{ color: A.accent }} />
+                            <CircularProgress sx={{ color: ADMIN_COLOR.accent }} />
                         </Box>
                     ) : images.length === 0 ? (
                         <Box sx={{ textAlign: 'center', py: 8 }}>
-                            <Typography sx={{ color: A.dim }}>No images uploaded for this product.</Typography>
+                            <Typography sx={{ color: ADMIN_COLOR.dim }}>No images uploaded for this product.</Typography>
                         </Box>
                     ) : (
                         <Box
@@ -163,18 +163,18 @@ export const ManageProductImagesModal: React.FC<ManageProductImagesModalProps> =
                                 <Box
                                     key={img.id}
                                     sx={{
-                                        border: `1px solid ${img.is_primary ? A.accent : A.border}`,
+                                        border: `1px solid ${img.is_primary ? ADMIN_COLOR.accent : ADMIN_COLOR.border}`,
                                         borderRadius: '8px',
                                         overflow: 'hidden',
                                         position: 'relative',
-                                        bgcolor: A.bg,
+                                        bgcolor: ADMIN_COLOR.bg,
                                     }}
                                 >
                                     {img.is_primary && (
                                         <Box
                                             sx={{
                                                 position: 'absolute', top: 6, left: 6,
-                                                bgcolor: A.accent, color: A.accentDark,
+                                                bgcolor: ADMIN_COLOR.accent, color: ADMIN_COLOR.accentDark,
                                                 fontSize: 10, fontWeight: 800,
                                                 px: 1, py: 0.25, borderRadius: '4px',
                                             }}
@@ -190,7 +190,7 @@ export const ManageProductImagesModal: React.FC<ManageProductImagesModalProps> =
                                         sx={{ width: '100%', height: 140, objectFit: 'cover', display: 'block' }}
                                     />
 
-                                    <Box sx={{ p: 1, display: 'flex', flexDirection: 'column', gap: 0.5, bgcolor: A.s2 }}>
+                                    <Box sx={{ p: 1, display: 'flex', flexDirection: 'column', gap: 0.5, bgcolor: ADMIN_COLOR.s2 }}>
                                         <VButton
                                             variant={img.is_primary ? 'ghost' : 'secondary'}
                                             size="small"

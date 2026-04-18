@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useSWR from 'swr';
 import { Box, Typography, Select, MenuItem, FormControl } from '@mui/material';
-import { A, statusColor } from '../admin.constants';
+import { ADMIN_COLOR, statusColor } from '../admin.constants';
 import { VTable } from '../../../../common/components/VTable';
 import type { VTableColumn } from '../../../../common/components/VTable';
 import { VButton } from '../../../../common/components/VButton';
@@ -39,14 +39,14 @@ const PAGE_SIZE = 10;
 const StatCard: React.FC<{ label: string; value: number; color: string }> = ({ label, value, color }) => (
     <Box
         sx={{
-            bgcolor: A.surface, border: `1px solid ${A.border}`, borderRadius: '10px',
+            bgcolor: ADMIN_COLOR.surface, border: `1px solid ${ADMIN_COLOR.border}`, borderRadius: '10px',
             p: 2, textAlign: 'center', flex: 1,
         }}
     >
         <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color, mb: 0.5 }}>
             {value}
         </Typography>
-        <Typography sx={{ fontSize: 11, color: A.dim, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        <Typography sx={{ fontSize: 11, color: ADMIN_COLOR.dim, textTransform: 'uppercase', letterSpacing: 0.5 }}>
             {label}
         </Typography>
     </Box>
@@ -93,7 +93,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ search }) => {
         {
             key: 'id', label: '#', width: 70,
             render: (r) => (
-                <Typography sx={{ fontSize: 13, color: A.accent, fontFamily: 'monospace', fontWeight: 600 }}>
+                <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.accent, fontFamily: 'monospace', fontWeight: 600 }}>
                     #{r.id}
                 </Typography>
             ),
@@ -101,13 +101,13 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ search }) => {
         {
             key: 'user_id', label: 'Customer',
             render: (r) => (
-                <Typography sx={{ fontSize: 13, color: A.text }}>User #{r.user_id}</Typography>
+                <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.text }}>User #{r.user_id}</Typography>
             ),
         },
         {
             key: 'total_price', label: 'Total', width: 110,
             render: (r) => (
-                <Typography sx={{ fontFamily: 'monospace', fontSize: 13, color: A.text }}>
+                <Typography sx={{ fontFamily: 'monospace', fontSize: 13, color: ADMIN_COLOR.text }}>
                     ${Number(r.total_price).toFixed(2)}
                 </Typography>
             ),
@@ -122,11 +122,11 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ search }) => {
                         onChange={(e) => handleStatusChange(r.id!, e.target.value as OrderStatus)}
                         sx={{
                             fontSize: 12,
-                            color: statusColor[r.status]?.text ?? A.dim,
+                            color: statusColor[r.status]?.text ?? ADMIN_COLOR.dim,
                             bgcolor: statusColor[r.status]?.bg ?? 'transparent',
                             borderRadius: '50px',
                             '.MuiOutlinedInput-notchedOutline': { border: 'none' },
-                            '.MuiSvgIcon-root': { color: A.dim },
+                            '.MuiSvgIcon-root': { color: ADMIN_COLOR.dim },
                             px: 0.5,
                         }}
                         renderValue={() => <StatusPill status={r.status} />}
@@ -143,7 +143,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ search }) => {
         {
             key: 'create_at', label: 'Date', width: 120,
             render: (r) => (
-                <Typography sx={{ fontSize: 12, color: A.dim }}>
+                <Typography sx={{ fontSize: 12, color: ADMIN_COLOR.dim }}>
                     {r.create_at ? dayjs(r.create_at).format('MMM D, YYYY') : '—'}
                 </Typography>
             ),
@@ -154,18 +154,18 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ search }) => {
         <Box sx={{ p: 3.5 }}>
             {/* Header */}
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color: A.text, letterSpacing: -0.5 }}>
+                <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color: ADMIN_COLOR.text, letterSpacing: -0.5 }}>
                     Orders
                 </Typography>
             </Box>
 
             {/* Status stats */}
             <Box sx={{ display: 'flex', gap: 1.5, mb: 3, flexWrap: 'wrap' }}>
-                <StatCard label="Pending" value={countByStatus(OrderStatus.PENDING)} color={A.dim} />
-                <StatCard label="Paid" value={countByStatus(OrderStatus.PAID)} color={A.orange} />
-                <StatCard label="Shipped" value={countByStatus(OrderStatus.SHIPPED)} color={A.blue} />
-                <StatCard label="Delivered" value={countByStatus(OrderStatus.DELIVERED)} color={A.green} />
-                <StatCard label="Cancelled" value={countByStatus(OrderStatus.CANCELLED)} color={A.red} />
+                <StatCard label="Pending" value={countByStatus(OrderStatus.PENDING)} color={ADMIN_COLOR.dim} />
+                <StatCard label="Paid" value={countByStatus(OrderStatus.PAID)} color={ADMIN_COLOR.orange} />
+                <StatCard label="Shipped" value={countByStatus(OrderStatus.SHIPPED)} color={ADMIN_COLOR.blue} />
+                <StatCard label="Delivered" value={countByStatus(OrderStatus.DELIVERED)} color={ADMIN_COLOR.green} />
+                <StatCard label="Cancelled" value={countByStatus(OrderStatus.CANCELLED)} color={ADMIN_COLOR.red} />
             </Box>
 
             {/* Filter row */}
@@ -176,11 +176,11 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ search }) => {
                         onClick={() => { setStatusFilter(s as OrderStatus | ''); setPage(1); }}
                         sx={{
                             px: 1.75, py: 0.75, borderRadius: '50px', fontSize: 12, fontWeight: 500,
-                            bgcolor: statusFilter === s ? A.accent : A.s2,
-                            color: statusFilter === s ? A.accentDark : A.dim,
-                            border: `1px solid ${statusFilter === s ? A.accent : A.border}`,
+                            bgcolor: statusFilter === s ? ADMIN_COLOR.accent : ADMIN_COLOR.s2,
+                            color: statusFilter === s ? ADMIN_COLOR.accentDark : ADMIN_COLOR.dim,
+                            border: `1px solid ${statusFilter === s ? ADMIN_COLOR.accent : ADMIN_COLOR.border}`,
                             cursor: 'pointer',
-                            '&:hover': { bgcolor: statusFilter === s ? A.accent : A.muted },
+                            '&:hover': { bgcolor: statusFilter === s ? ADMIN_COLOR.accent : ADMIN_COLOR.muted },
                             transition: 'background 0.15s',
                             textTransform: 'capitalize',
                         }}
@@ -199,7 +199,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ search }) => {
                     <VButton variant="ghost" size="small" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
                         ← Prev
                     </VButton>
-                    <Typography sx={{ fontSize: 12, color: A.dim }}>
+                    <Typography sx={{ fontSize: 12, color: ADMIN_COLOR.dim }}>
                         {page} / {totalPages}
                     </Typography>
                     <VButton variant="ghost" size="small" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>

@@ -1,5 +1,5 @@
 /** Shared dark-theme colour tokens for the admin panel */
-export const A = {
+export const ADMIN_COLOR = {
     bg:      '#0d0d0d',
     surface: '#141414',
     s2:      '#1a1a1a',

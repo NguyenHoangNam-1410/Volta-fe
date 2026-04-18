@@ -1,4 +1,4 @@
-import type { CreateOrderResponse, CustomerOrder, CustomerOrderDetail, Order, OrderRequestParam, OrderStat, RequestCreateOrderDto, RequestUpdateOrderDto } from "./order.interface";
+import type { CreateOrderResponse, CustomerOrder, CustomerOrderDetail, Order, OrderRequestParam, OrderStat, OrderStatsRequestParam, RequestCreateOrderDto, RequestUpdateOrderDto } from "./order.interface";
 import type { PaginatedResponse, ApiResponse } from "../../common/interfaces/base-requestdto.interface";
 import axiosInstance from "../../common/configs/axios.config";
 import type { OrderStatus } from "./order.enum";
@@ -31,8 +31,8 @@ export const deleteOrder = (id: string): Promise<ApiResponse<ApiResponse<void>>>
     return axiosInstance.delete(`${ADMIN_BASE_URL}/${id}`);
 }
 
-export const getOrderStats = (startDate: string, endDate: string): Promise<ApiResponse<ApiResponse<OrderStat>>> => {
-    return axiosInstance.get(`${ADMIN_BASE_URL}/stats`, { params: { start_date: startDate, end_date: endDate } });
+export const getOrderStats = (params?: OrderStatsRequestParam): Promise<ApiResponse<ApiResponse<OrderStat>>> => {
+    return axiosInstance.get(`${ADMIN_BASE_URL}/stats`, { params });
 }
 
 export const getCustomerOrders = (params?: OrderRequestParam): Promise<ApiResponse<PaginatedResponse<CustomerOrder>>> => {

@@ -9,7 +9,7 @@ import {
     DialogActions,
     TextField,
 } from '@mui/material';
-import { A } from '../admin.constants';
+import { ADMIN_COLOR } from '../admin.constants';
 import { VTable, VButton } from '../../../../common/components';
 import type { VTableColumn } from '../../../../common/components/VTable';
 import { getAllCategories, createCategory, updateCategory, deleteCategory } from '../../../../apis/categories/category.api';
@@ -105,16 +105,16 @@ export const CategoriesTab: React.FC<{ search?: string }> = ({ search = '' }) =>
     ];
 
     const dialogSx = {
-        bgcolor: A.surface,
-        color: A.text,
-        border: `1px solid ${A.border}`,
+        bgcolor: ADMIN_COLOR.surface,
+        color: ADMIN_COLOR.text,
+        border: `1px solid ${ADMIN_COLOR.border}`,
         borderRadius: '16px',
     };
 
     return (
         <Box sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography sx={{ color: A.dim, fontSize: 13 }}>
+                <Typography sx={{ color: ADMIN_COLOR.dim, fontSize: 13 }}>
                     {filtered.length} categories
                 </Typography>
                 <VButton variant="secondary" size="small" onClick={openCreate}>
@@ -123,28 +123,28 @@ export const CategoriesTab: React.FC<{ search?: string }> = ({ search = '' }) =>
             </Box>
 
             {isLoading ? (
-                <Typography sx={{ color: A.dim }}>Loading...</Typography>
+                <Typography sx={{ color: ADMIN_COLOR.dim }}>Loading...</Typography>
             ) : (
                 <VTable columns={columns} data={filtered} />
             )}
 
             {/* Create/Edit dialog */}
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth PaperProps={{ sx: dialogSx }}>
-                <DialogTitle sx={{ color: A.text }}>{editing ? 'Edit Category' : 'New Category'}</DialogTitle>
+                <DialogTitle sx={{ color: ADMIN_COLOR.text }}>{editing ? 'Edit Category' : 'New Category'}</DialogTitle>
                 <DialogContent>
                     <TextField
                         label="Name"
                         fullWidth
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        sx={{ mb: 2, mt: 1, '& .MuiInputBase-root': { color: A.text }, '& .MuiInputLabel-root': { color: A.dim } }}
+                        sx={{ mb: 2, mt: 1, '& .MuiInputBase-root': { color: ADMIN_COLOR.text }, '& .MuiInputLabel-root': { color: ADMIN_COLOR.dim } }}
                     />
                     <TextField
                         label="Slug"
                         fullWidth
                         value={form.slug}
                         onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                        sx={{ '& .MuiInputBase-root': { color: A.text }, '& .MuiInputLabel-root': { color: A.dim } }}
+                        sx={{ '& .MuiInputBase-root': { color: ADMIN_COLOR.text }, '& .MuiInputLabel-root': { color: ADMIN_COLOR.dim } }}
                     />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
@@ -155,9 +155,9 @@ export const CategoriesTab: React.FC<{ search?: string }> = ({ search = '' }) =>
 
             {/* Delete confirm */}
             <Dialog open={deleteDialogId !== null} onClose={() => setDeleteDialogId(null)} maxWidth="xs" PaperProps={{ sx: dialogSx }}>
-                <DialogTitle sx={{ color: A.text }}>Delete Category</DialogTitle>
+                <DialogTitle sx={{ color: ADMIN_COLOR.text }}>Delete Category</DialogTitle>
                 <DialogContent>
-                    <Typography sx={{ color: A.dim }}>Are you sure? This action cannot be undone.</Typography>
+                    <Typography sx={{ color: ADMIN_COLOR.dim }}>Are you sure? This action cannot be undone.</Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
                     <VButton variant="ghost" onClick={() => setDeleteDialogId(null)}>Cancel</VButton>

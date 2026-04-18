@@ -1,221 +1,636 @@
-import React from 'react';
-import useSWR from 'swr';
-import { Box, Typography, Grid } from '@mui/material';
-import { A, statusColor } from '../admin.constants';
-import { VTable } from '../../../../common/components/VTable';
-import type { VTableColumn } from '../../../../common/components/VTable';
-import { getAllOrder, getOrderStats } from '../../../../apis/orders/order.api';
-import { getAllProduct } from '../../../../apis/products/product.api';
-import type { Order } from '../../../../apis/orders/order.interface';
-import type { Product } from '../../../../apis/products/product.interface';
-import type { PaginatedResponse } from '../../../../common/interfaces/base-requestdto.interface';
-import dayjs from 'dayjs';
-
-// ── Helpers ─────────────────────────────────────────────────────────────────
-
-const StatusPill: React.FC<{ status: string }> = ({ status }) => {
-    const c = statusColor[status] ?? { bg: 'rgba(136,136,136,0.12)', text: '#888' };
-    return (
-        <Box
-            sx={{
-                display: 'inline-flex', alignItems: 'center', gap: 0.6,
-                bgcolor: c.bg, color: c.text,
-                fontSize: 11, fontWeight: 600,
-                px: 1.25, py: 0.375, borderRadius: '50px',
-            }}
-        >
-            <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: 'currentColor' }} />
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-        </Box>
-    );
-};
+import React, { useState } from "react";
+import useSWR from "swr";
+import {
+  Box,
+  Typography,
+  Grid,
+  TextField,
+  MenuItem,
+  Tooltip,
+} from "@mui/material";
+import { ADMIN_COLOR, statusColor } from "../admin.constants";
+import { VTable } from "../../../../common/components/VTable";
+import type { VTableColumn } from "../../../../common/components/VTable";
+import { getOrderStats } from "../../../../apis/orders/order.api";
+import type {
+  RecentOrderStat,
+  TopProductStat,
+} from "../../../../apis/orders/order.interface";
+import dayjs from "dayjs";
+import { KpiCard } from "./kpi-card.component";
+import {
+  DAYS_OPTIONS,
+  ROW_OPTIONS,
+  STATUS_LIST,
+  createFieldSx,
+  buildStatsParams,
+  buildSWRKey,
+  calculateKPIs,
+  processRevenueChartData,
+  generateDateRangeLabel,
+  generatePeriodSubtitle,
+  extractEffectiveFilter,
+  extractTableData,
+  getInitialDateRange,
+} from "./dashboard.constant";
 
 // Simple SVG bar chart (no external chart lib needed)
-const BarChart: React.FC<{ values: number[]; labels: string[] }> = ({ values, labels }) => {
-    const max = Math.max(...values, 1);
-    return (
-        <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: '6px', height: 120 }}>
-            {values.map((v, i) => (
-                <Box key={i} sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
-                    <Box
-                        sx={{
-                            width: '100%',
-                            height: `${(v / max) * 100}px`,
-                            bgcolor: A.accent,
-                            borderRadius: '4px 4px 0 0',
-                            transition: 'height 0.6s ease',
-                            minHeight: 4,
-                        }}
-                    />
-                    <Typography sx={{ fontSize: 10, color: A.dim }}>{labels[i]}</Typography>
-                </Box>
-            ))}
-        </Box>
-    );
+const BarChart: React.FC<{
+  values: number[];
+  labels: string[];
+  tooltips?: string[];
+}> = ({ values, labels, tooltips }) => {
+  const max = Math.max(...values, 1);
+  const barWidth = 34;
+  const gap = 6;
+  const contentWidth = Math.max(420, values.length * (barWidth + gap));
+
+  return (
+    <Box
+      sx={{
+        overflowX: "auto",
+        overflowY: "hidden",
+        pb: 0.5,
+        scrollbarWidth: "thin",
+        scrollbarColor: `${ADMIN_COLOR.accent} ${ADMIN_COLOR.surface}`,
+        "&::-webkit-scrollbar": {
+          height: 6,
+        },
+        "&::-webkit-scrollbar-track": {
+          background: ADMIN_COLOR.surface,
+          borderRadius: 999,
+        },
+        "&::-webkit-scrollbar-thumb": {
+          background: ADMIN_COLOR.accent,
+          borderRadius: 999,
+          border: `1px solid ${ADMIN_COLOR.surface}`,
+        },
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "flex-end",
+          gap: `${gap}px`,
+          height: 120,
+          minWidth: `${contentWidth}px`,
+          width: "max-content",
+        }}
+      >
+        {values.map((v, i) => (
+          <Box
+            key={i}
+            sx={{
+              width: `${barWidth}px`,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 0.5,
+            }}
+          >
+            <Tooltip
+              title={tooltips?.[i] ?? `$${Number(v).toLocaleString()}`}
+              arrow
+              placement="top"
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  height: `${(v / max) * 100}px`,
+                  bgcolor: ADMIN_COLOR.accent,
+                  borderRadius: "4px 4px 0 0",
+                  transition: "height 0.6s ease",
+                  minHeight: 4,
+                  cursor: "pointer",
+                }}
+              />
+            </Tooltip>
+            <Typography sx={{ fontSize: 10, color: ADMIN_COLOR.dim }}>
+              {labels[i]}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
 };
 
-// ── KPI Card ────────────────────────────────────────────────────────────────
+// ── Table Column Definitions ────────────────────────────────────────────────
 
-interface KpiCardProps {
-    label: string;
-    icon: string;
-    value: string;
-    change?: string;
-    up?: boolean;
-}
-
-const KpiCard: React.FC<KpiCardProps> = ({ label, icon, value, change, up }) => (
-    <Box
-        sx={{
-            bgcolor: A.surface,
-            border: `1px solid ${A.border}`,
-            borderRadius: '10px',
-            p: 2.5,
-        }}
-    >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.75 }}>
-            <Typography sx={{ fontSize: 12, color: A.dim, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                {label}
-            </Typography>
-            <Typography sx={{ fontSize: 18 }}>{icon}</Typography>
-        </Box>
-        <Typography
-            sx={{ fontFamily: "'Syne', sans-serif", fontSize: 30, fontWeight: 800, letterSpacing: -1, color: A.text, mb: 0.5 }}
+const getOrderColumns = (): VTableColumn<RecentOrderStat>[] => [
+  {
+    key: "order_id",
+    label: "#",
+    width: 60,
+    render: (r) => (
+      <Typography
+        sx={{ fontSize: 13, color: ADMIN_COLOR.accent, fontFamily: "monospace" }}
+      >
+        #{r.order_id}
+      </Typography>
+    ),
+  },
+  {
+    key: "customer",
+    label: "Customer",
+    render: (r) => (
+      <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.text }}>{r.customer}</Typography>
+    ),
+  },
+  {
+    key: "total",
+    label: "Total",
+    render: (r) => (
+      <Typography sx={{ fontFamily: "monospace", fontSize: 13, color: ADMIN_COLOR.text }}>
+        ${Number(r.total).toFixed(2)}
+      </Typography>
+    ),
+  },
+  {
+    key: "status",
+    label: "Status",
+    render: (r) => {
+      const c = statusColor[r.status] ?? {
+        bg: "rgba(136,136,136,0.12)",
+        text: "#888",
+      };
+      return (
+        <Box
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 0.6,
+            bgcolor: c.bg,
+            color: c.text,
+            fontSize: 11,
+            fontWeight: 600,
+            px: 1.25,
+            py: 0.375,
+            borderRadius: "50px",
+          }}
         >
-            {value}
+          <Box
+            sx={{
+              width: 5,
+              height: 5,
+              borderRadius: "50%",
+              bgcolor: "currentColor",
+            }}
+          />
+          {r.status.charAt(0).toUpperCase() + r.status.slice(1)}
+        </Box>
+      );
+    },
+  },
+  {
+    key: "date",
+    label: "Date",
+    render: (r) => (
+      <Typography sx={{ fontSize: 12, color: ADMIN_COLOR.dim }}>
+        {r.date ? dayjs(r.date).format("MMM D") : "—"}
+      </Typography>
+    ),
+  },
+];
+
+const getProductColumns = (): VTableColumn<TopProductStat>[] => [
+  {
+    key: "product",
+    label: "Product",
+    render: (r) => (
+      <Box>
+        <Typography sx={{ fontSize: 13, fontWeight: 500, color: ADMIN_COLOR.text }}>
+          {r.product}
         </Typography>
-        {change && (
-            <Typography sx={{ fontSize: 12, color: up ? A.green : A.red }}>
-                {up ? '↑' : '↓'} {change}
-            </Typography>
-        )}
-    </Box>
-);
+        <Typography
+          sx={{ fontSize: 11, color: ADMIN_COLOR.dim, fontFamily: "monospace" }}
+        >
+          #{r.product_id}
+        </Typography>
+      </Box>
+    ),
+  },
+  {
+    key: "price",
+    label: "Price",
+    render: (r) => (
+      <Typography sx={{ fontFamily: "monospace", fontSize: 13, color: ADMIN_COLOR.text }}>
+        ${Number(r.price).toFixed(2)}
+      </Typography>
+    ),
+  },
+  {
+    key: "sold_quantity",
+    label: "Sold",
+    render: (r) => (
+      <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.green }}>
+        {r.sold_quantity}
+      </Typography>
+    ),
+  },
+  {
+    key: "stock",
+    label: "Stock",
+    render: (r) => (
+      <Typography sx={{ fontSize: 13, color: r.stock < 10 ? ADMIN_COLOR.red : ADMIN_COLOR.dim }}>
+        {r.stock}
+      </Typography>
+    ),
+  },
+];
 
 // ── Dashboard Tab ────────────────────────────────────────────────────────────
 
 export const DashboardTab: React.FC = () => {
-    const now = dayjs();
-    const startDate = now.subtract(30, 'day').format('YYYY-MM-DD');
-    const endDate = now.format('YYYY-MM-DD');
+  const { startDate, endDate } = getInitialDateRange();
+  const [curStartDate, setCurStartDate] = useState(startDate);
+  const [curEndDate, setCurEndDate] = useState(endDate);
+  const [days, setDays] = useState(14);
+  const [filterMode, setFilterMode] = useState<"manual" | "preset">("preset");
+  const [recentLimit, setRecentLimit] = useState(10);
+  const [topLimit, setTopLimit] = useState(10);
 
-    const { data: statsResp } = useSWR(
-        ['order-stats', startDate, endDate],
-        () => getOrderStats(startDate, endDate).then((r) => r.data?.data),
-    );
+  const FIELD_SX = createFieldSx(ADMIN_COLOR);
 
-    const { data: ordersResp } = useSWR<PaginatedResponse<Order>>(
-        ['orders', 1, 5, ''],
-        () => getAllOrder({ page: 1, limit: 5 }).then((r) => r.data),
-    );
+  const statsParams = buildStatsParams(
+    filterMode,
+    curStartDate,
+    curEndDate,
+    days,
+    recentLimit,
+    topLimit,
+  );
 
-    const { data: productsResp } = useSWR<PaginatedResponse<Product>>(
-        ['products', 1, 5, ''],
-        () => getAllProduct({ page: 1, limit: 5 }).then((r) => r.data),
-    );
+  const swrKey = buildSWRKey(
+    filterMode,
+    curStartDate,
+    curEndDate,
+    days,
+    recentLimit,
+    topLimit,
+  );
 
-    const recentOrders = ordersResp?.data ?? [];
-    const topProducts = productsResp?.data ?? [];
+  const { data: statsResp } = useSWR(swrKey, () =>
+    getOrderStats(statsParams).then((r) => r.data?.data),
+  );
 
-    const totalRevenue = statsResp?.total_revenue ?? 0;
-    const totalOrders = statsResp?.total_orders ?? 0;
-    const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  // Extract & process data
+  const { totalRevenue, totalOrders, avgOrder, completedOrders } =
+    calculateKPIs(statsResp);
+  const { recentOrders, topProducts } = extractTableData(statsResp);
+  const { weekBars, weekLabels, weekTooltips } =
+    processRevenueChartData(statsResp);
+  const { effectiveStart, effectiveEnd, effectiveMode, effectiveDays } =
+    extractEffectiveFilter(statsResp);
 
-    // Mock weekly revenue bars (placeholder — replace with real data if endpoint exists)
-    const weekBars = [820, 1200, 950, 1400, 1100, 1600, 1380];
-    const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dateRangeLabel = generateDateRangeLabel(
+    effectiveStart,
+    effectiveEnd,
+    filterMode,
+    days,
+    curStartDate,
+    curEndDate,
+  );
 
-    const orderColumns: VTableColumn<Order>[] = [
-        { key: 'id', label: '#', width: 60, render: (r) => <Typography sx={{ fontSize: 13, color: A.accent, fontFamily: 'monospace' }}>#{r.id}</Typography> },
-        { key: 'user_id', label: 'Customer', render: (r) => <Typography sx={{ fontSize: 13, color: A.text }}>User #{r.user_id}</Typography> },
-        { key: 'total_price', label: 'Total', render: (r) => <Typography sx={{ fontFamily: 'monospace', fontSize: 13, color: A.text }}>${Number(r.total_price).toFixed(2)}</Typography> },
-        { key: 'status', label: 'Status', render: (r) => <StatusPill status={r.status} /> },
-        { key: 'create_at', label: 'Date', render: (r) => <Typography sx={{ fontSize: 12, color: A.dim }}>{r.create_at ? dayjs(r.create_at).format('MMM D') : '—'}</Typography> },
-    ];
+  const periodSubtitle = generatePeriodSubtitle(
+    effectiveMode,
+    effectiveDays,
+    days,
+    dateRangeLabel,
+    statsResp?.revenue_window_days,
+  );
 
-    const productColumns: VTableColumn<Product>[] = [
-        {
-            key: 'name', label: 'Product', render: (r) => (
-                <Box>
-                    <Typography sx={{ fontSize: 13, fontWeight: 500, color: A.text }}>{r.name}</Typography>
-                    <Typography sx={{ fontSize: 11, color: A.dim, fontFamily: 'monospace' }}>{r.slug}</Typography>
+  const orderColumns = getOrderColumns();
+  const productColumns = getProductColumns();
+
+  return (
+    <Box sx={{ p: 3.5 }}>
+      {/* Date range */}
+      <Box
+        sx={{
+          mb: 2.5,
+          p: 2,
+          bgcolor: ADMIN_COLOR.surface,
+          border: `1px solid ${ADMIN_COLOR.border}`,
+          borderRadius: "10px",
+          display: "flex",
+          gap: 1.5,
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        <Typography
+          sx={{
+            fontSize: 12,
+            color: ADMIN_COLOR.dim,
+            textTransform: "uppercase",
+            letterSpacing: 0.6,
+          }}
+        >
+          Stats Range
+        </Typography>
+        <TextField
+          type="date"
+          size="small"
+          label="Start"
+          value={curStartDate}
+          onChange={(e) => {
+            const next = e.target.value;
+            setFilterMode("manual");
+            setCurStartDate(next);
+            if (next > curEndDate) setCurEndDate(next);
+          }}
+          slotProps={{ inputLabel: { shrink: true } }}
+          sx={{ ...FIELD_SX, minWidth: 170 }}
+        />
+        <TextField
+          type="date"
+          size="small"
+          label="End"
+          value={curEndDate}
+          onChange={(e) => {
+            const next = e.target.value;
+            setFilterMode("manual");
+            setCurEndDate(next);
+            if (next < curStartDate) setCurStartDate(next);
+          }}
+          slotProps={{ inputLabel: { shrink: true } }}
+          sx={{ ...FIELD_SX, minWidth: 170 }}
+        />
+      </Box>
+
+      {/* KPI Cards */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <KpiCard
+            label="Revenue"
+            icon="💰"
+            value={`$${totalRevenue.toLocaleString()}`}
+            change={periodSubtitle}
+            up
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <KpiCard
+            label="Orders"
+            icon="📦"
+            value={String(totalOrders)}
+            change={periodSubtitle}
+            up
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <KpiCard
+            label="Avg. Order"
+            icon="🛒"
+            value={`$${avgOrder.toFixed(2)}`}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <KpiCard
+            label="Completed"
+            icon="✅"
+            value={String(completedOrders)}
+          />
+        </Grid>
+      </Grid>
+
+      {/* Charts row */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid size={{ xs: 12, md: 8 }}>
+          <Box
+            sx={{
+              bgcolor: ADMIN_COLOR.surface,
+              border: `1px solid ${ADMIN_COLOR.border}`,
+              borderRadius: "10px",
+              p: 2.5,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 2,
+                gap: 1,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: ADMIN_COLOR.text,
+                }}
+              >
+                Revenue — {dateRangeLabel}
+              </Typography>
+              <TextField
+                select
+                size="small"
+                label="Days"
+                value={days}
+                onChange={(e) => {
+                  setFilterMode("preset");
+                  setDays(Number(e.target.value));
+                }}
+                sx={{ ...FIELD_SX, minWidth: 110 }}
+              >
+                {DAYS_OPTIONS.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+            {weekBars.length > 0 ? (
+              <BarChart
+                values={weekBars}
+                labels={weekLabels}
+                tooltips={weekTooltips}
+              />
+            ) : (
+              <Typography sx={{ fontSize: 12, color: ADMIN_COLOR.dim }}>
+                No revenue data in selected range.
+              </Typography>
+            )}
+          </Box>
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Box
+            sx={{
+              bgcolor: ADMIN_COLOR.surface,
+              border: `1px solid ${ADMIN_COLOR.border}`,
+              borderRadius: "10px",
+              p: 2.5,
+              height: "100%",
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: "'Syne', sans-serif",
+                fontSize: 14,
+                fontWeight: 700,
+                color: ADMIN_COLOR.text,
+                mb: 2,
+              }}
+            >
+              Recent Order Status
+            </Typography>
+            {STATUS_LIST.map((s) => {
+              const c = statusColor[s];
+              return (
+                <Box
+                  key={s}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 1,
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Box
+                      sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: "50%",
+                        bgcolor: c.text,
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        fontSize: 12,
+                        color: ADMIN_COLOR.dim,
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {s}
+                    </Typography>
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      color: c.text,
+                      fontFamily: "monospace",
+                    }}
+                  >
+                    {
+                      recentOrders.filter(
+                        (o: RecentOrderStat) => o.status === s,
+                      ).length
+                    }
+                  </Typography>
                 </Box>
-            )
-        },
-        { key: 'price', label: 'Price', render: (r) => <Typography sx={{ fontFamily: 'monospace', fontSize: 13, color: A.text }}>${Number(r.price).toFixed(2)}</Typography> },
-        { key: 'stock', label: 'Stock', render: (r) => <Typography sx={{ fontSize: 13, color: r.stock < 10 ? A.red : A.green }}>{r.stock}</Typography> },
-    ];
+              );
+            })}
+          </Box>
+        </Grid>
+      </Grid>
 
-    return (
-        <Box sx={{ p: 3.5 }}>
-            {/* KPI Cards */}
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <KpiCard label="Revenue" icon="💰" value={`$${totalRevenue.toLocaleString()}`} change="last 30 days" up />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <KpiCard label="Orders" icon="📦" value={String(totalOrders)} change="last 30 days" up />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <KpiCard label="Avg. Order" icon="🛒" value={`$${avgOrder.toFixed(2)}`} />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <KpiCard label="Completed" icon="✅" value={String(statsResp?.completed_orders ?? 0)} />
-                </Grid>
-            </Grid>
-
-            {/* Charts row */}
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid size={{ xs: 12, md: 8 }}>
-                    <Box sx={{ bgcolor: A.surface, border: `1px solid ${A.border}`, borderRadius: '10px', p: 2.5 }}>
-                        <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 14, fontWeight: 700, color: A.text, mb: 2 }}>
-                            Revenue — Last 7 Days
-                        </Typography>
-                        <BarChart values={weekBars} labels={weekLabels} />
-                    </Box>
-                </Grid>
-                <Grid size={{ xs: 12, md: 4 }}>
-                    <Box sx={{ bgcolor: A.surface, border: `1px solid ${A.border}`, borderRadius: '10px', p: 2.5, height: '100%' }}>
-                        <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 14, fontWeight: 700, color: A.text, mb: 2 }}>
-                            Order Status
-                        </Typography>
-                        {(['pending', 'paid', 'shipped', 'delivered', 'cancelled'] as const).map((s) => {
-                            const c = statusColor[s];
-                            return (
-                                <Box key={s} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: c.text }} />
-                                        <Typography sx={{ fontSize: 12, color: A.dim, textTransform: 'capitalize' }}>{s}</Typography>
-                                    </Box>
-                                    <Typography sx={{ fontSize: 12, color: c.text, fontFamily: 'monospace' }}>
-                                        {recentOrders.filter((o) => o.status === s).length}
-                                    </Typography>
-                                </Box>
-                            );
-                        })}
-                    </Box>
-                </Grid>
-            </Grid>
-
-            {/* Tables row */}
-            <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 7 }}>
-                    <Box sx={{ bgcolor: A.surface, border: `1px solid ${A.border}`, borderRadius: '10px', p: 2.5 }}>
-                        <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 14, fontWeight: 700, color: A.text, mb: 2 }}>
-                            Recent Orders
-                        </Typography>
-                        <VTable<Order> columns={orderColumns} data={recentOrders} sx={{ border: 'none', borderRadius: 0 }} />
-                    </Box>
-                </Grid>
-                <Grid size={{ xs: 12, md: 5 }}>
-                    <Box sx={{ bgcolor: A.surface, border: `1px solid ${A.border}`, borderRadius: '10px', p: 2.5 }}>
-                        <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 14, fontWeight: 700, color: A.text, mb: 2 }}>
-                            Top Products
-                        </Typography>
-                        <VTable<Product> columns={productColumns} data={topProducts} sx={{ border: 'none', borderRadius: 0 }} />
-                    </Box>
-                </Grid>
-            </Grid>
-        </Box>
-    );
+      {/* Tables row */}
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, md: 7 }}>
+          <Box
+            sx={{
+              bgcolor: ADMIN_COLOR.surface,
+              border: `1px solid ${ADMIN_COLOR.border}`,
+              borderRadius: "10px",
+              p: 2.5,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 2,
+                gap: 1,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: ADMIN_COLOR.text,
+                }}
+              >
+                Recent Orders
+              </Typography>
+              <TextField
+                select
+                size="small"
+                label="Rows"
+                value={recentLimit}
+                onChange={(e) => setRecentLimit(Number(e.target.value))}
+                sx={{ ...FIELD_SX, minWidth: 110 }}
+              >
+                {ROW_OPTIONS.map((option) => (
+                  <MenuItem key={`recent-${option}`} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+            <VTable
+              columns={orderColumns}
+              data={recentOrders}
+              sx={{ border: "none", borderRadius: 0 }}
+            />
+          </Box>
+        </Grid>
+        <Grid size={{ xs: 12, md: 5 }}>
+          <Box
+            sx={{
+              bgcolor: ADMIN_COLOR.surface,
+              border: `1px solid ${ADMIN_COLOR.border}`,
+              borderRadius: "10px",
+              p: 2.5,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 2,
+                gap: 1,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: ADMIN_COLOR.text,
+                }}
+              >
+                Top Products
+              </Typography>
+              <TextField
+                select
+                size="small"
+                label="Rows"
+                value={topLimit}
+                onChange={(e) => setTopLimit(Number(e.target.value))}
+                sx={{ ...FIELD_SX, minWidth: 110 }}
+              >
+                {ROW_OPTIONS.map((option) => (
+                  <MenuItem key={`top-${option}`} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+            <VTable
+              columns={productColumns}
+              data={topProducts}
+              sx={{ border: "none", borderRadius: 0 }}
+            />
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 };

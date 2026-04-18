@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { A } from '../admin.constants';
+import { ADMIN_COLOR } from '../admin.constants';
 import { VTable } from '../../../../common/components/VTable';
 import type { VTableColumn } from '../../../../common/components/VTable';
 import { VButton } from '../../../../common/components/VButton';
@@ -76,14 +76,14 @@ const DiscountFormModal: React.FC<DiscountFormModalProps> = ({
 
     const darkFieldSx = {
         '& .MuiOutlinedInput-root': {
-            color: A.text,
-            bgcolor: A.bg,
-            '& fieldset': { borderColor: A.border },
-            '&:hover fieldset': { borderColor: A.border },
-            '&.Mui-focused fieldset': { borderColor: A.accent },
+            color: ADMIN_COLOR.text,
+            bgcolor: ADMIN_COLOR.bg,
+            '& fieldset': { borderColor: ADMIN_COLOR.border },
+            '&:hover fieldset': { borderColor: ADMIN_COLOR.border },
+            '&.Mui-focused fieldset': { borderColor: ADMIN_COLOR.accent },
         },
-        '& .MuiInputLabel-root': { color: A.dim },
-        '& .MuiInputLabel-root.Mui-focused': { color: A.text },
+        '& .MuiInputLabel-root': { color: ADMIN_COLOR.dim },
+        '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_COLOR.text },
     };
 
     return (
@@ -93,20 +93,20 @@ const DiscountFormModal: React.FC<DiscountFormModalProps> = ({
                     position: 'absolute', top: '50%', left: '50%',
                     transform: 'translate(-50%, -50%)',
                     width: { xs: '95vw', sm: 480 },
-                    bgcolor: A.surface,
-                    border: `1px solid ${A.border}`,
+                    bgcolor: ADMIN_COLOR.surface,
+                    border: `1px solid ${ADMIN_COLOR.border}`,
                     borderRadius: '12px',
                     p: 3,
                     outline: 'none',
                 }}
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                    <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 18, fontWeight: 800, color: A.text }}>
+                    <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 18, fontWeight: 800, color: ADMIN_COLOR.text }}>
                         {isEdit ? 'Edit Discount' : 'New Discount Code'}
                     </Typography>
-                    <IconButton onClick={onClose} size="small" sx={{ color: A.dim }}>✕</IconButton>
+                    <IconButton onClick={onClose} size="small" sx={{ color: ADMIN_COLOR.dim }}>✕</IconButton>
                 </Box>
-                <Divider sx={{ borderColor: A.border, mb: 2.5 }} />
+                <Divider sx={{ borderColor: ADMIN_COLOR.border, mb: 2.5 }} />
 
                 <form onSubmit={formik.handleSubmit}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -167,7 +167,7 @@ const DiscountFormModal: React.FC<DiscountFormModalProps> = ({
                             sx={darkFieldSx}
                         />
 
-                        <Divider sx={{ borderColor: A.border }} />
+                        <Divider sx={{ borderColor: ADMIN_COLOR.border }} />
 
                         <Box sx={{ display: 'flex', gap: 1.5, justifyContent: 'flex-end' }}>
                             <VButton variant="ghost" onClick={onClose} type="button">Cancel</VButton>
@@ -244,10 +244,10 @@ export const DiscountsTab: React.FC = () => {
                 <Box
                     sx={{
                         display: 'inline-block',
-                        bgcolor: A.s2, color: A.accent,
+                        bgcolor: ADMIN_COLOR.s2, color: ADMIN_COLOR.accent,
                         fontFamily: 'monospace', fontSize: 12,
                         px: 1, py: 0.375, borderRadius: '4px',
-                        border: `1px solid ${A.border}`,
+                        border: `1px solid ${ADMIN_COLOR.border}`,
                     }}
                 >
                     {r.code}
@@ -256,12 +256,12 @@ export const DiscountsTab: React.FC = () => {
         },
         {
             key: 'type', label: 'Type', width: 90,
-            render: (r) => <Typography sx={{ fontSize: 13, color: A.dim, textTransform: 'capitalize' }}>{r.type}</Typography>,
+            render: (r) => <Typography sx={{ fontSize: 13, color: ADMIN_COLOR.dim, textTransform: 'capitalize' }}>{r.type}</Typography>,
         },
         {
             key: 'value', label: 'Value', width: 90,
             render: (r) => (
-                <Typography sx={{ fontFamily: 'monospace', fontSize: 13, color: A.text }}>
+                <Typography sx={{ fontFamily: 'monospace', fontSize: 13, color: ADMIN_COLOR.text }}>
                     {r.type === DiscountType.Percent ? `${r.value}%` : `$${r.value}`}
                 </Typography>
             ),
@@ -269,7 +269,7 @@ export const DiscountsTab: React.FC = () => {
         {
             key: 'min_order', label: 'Min Order', width: 110,
             render: (r) => (
-                <Typography sx={{ fontFamily: 'monospace', fontSize: 13, color: A.dim }}>
+                <Typography sx={{ fontFamily: 'monospace', fontSize: 13, color: ADMIN_COLOR.dim }}>
                     {r.min_order > 0 ? `$${r.min_order}` : '—'}
                 </Typography>
             ),
@@ -277,7 +277,7 @@ export const DiscountsTab: React.FC = () => {
         {
             key: 'uses_remaining', label: 'Uses Left', width: 100,
             render: (r) => (
-                <Typography sx={{ fontSize: 13, color: r.uses_remaining !== null && r.uses_remaining < 100 ? A.red : A.dim }}>
+                <Typography sx={{ fontSize: 13, color: r.uses_remaining !== null && r.uses_remaining < 100 ? ADMIN_COLOR.red : ADMIN_COLOR.dim }}>
                     {r.uses_remaining === null ? '∞' : r.uses_remaining}
                 </Typography>
             ),
@@ -285,7 +285,7 @@ export const DiscountsTab: React.FC = () => {
         {
             key: 'expires_at', label: 'Expires', width: 130,
             render: (r) => (
-                <Typography sx={{ fontSize: 12, color: A.dim }}>
+                <Typography sx={{ fontSize: 12, color: ADMIN_COLOR.dim }}>
                     {r.expires_at ? dayjs(r.expires_at).format('MMM D, YYYY') : 'No expiry'}
                 </Typography>
             ),
@@ -304,7 +304,7 @@ export const DiscountsTab: React.FC = () => {
     return (
         <Box sx={{ p: 3.5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color: A.text, letterSpacing: -0.5 }}>
+                <Typography sx={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color: ADMIN_COLOR.text, letterSpacing: -0.5 }}>
                     Discounts
                 </Typography>
                 <VButton variant="secondary" onClick={handleAdd}>+ New Code</VButton>
