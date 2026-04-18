@@ -1,7 +1,7 @@
-import type { ProductDetail, ShopRequestParam, ShopProductResponse, FeaturedBadge, ProductImage} from "./shop.interface";
+import type { ProductDetail, ShopRequestParam, ShopProductResponse, FeaturedBadge} from "./shop.interface";
 import axiosInstance from "../../common/configs/axios.config";
 import type { Category } from "../categories/category.interface";
-import type { Product } from "../products/product.interface";
+import type { Product, ProductImage } from "../products/product.interface";
 import type { ApiResponse } from "../../common/interfaces/base-requestdto.interface";
 
 export const getShops = (params: ShopRequestParam): Promise<ApiResponse<ShopProductResponse>> => {
