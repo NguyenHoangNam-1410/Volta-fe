@@ -31,7 +31,6 @@ export const routes: RouteConfig[] = [
     path: ROUTES.CART,
     component: CartScreen,
     label: "Cart",
-    requiresAuth: true,
     hideFromNav: true,
   },
   {
