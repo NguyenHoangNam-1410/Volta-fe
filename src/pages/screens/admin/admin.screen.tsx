@@ -5,6 +5,7 @@ import {
   getStoredUser,
   isAuthenticated,
 } from "../../../common/utils/auth-session";
+import SearchIcon from "@mui/icons-material/Search";
 import { COLOR_BRAND } from "../../../common/constants/color.constant";
 import { ADMIN_COLOR } from "./admin.constants";
 import { DashboardTab } from "./dashboard/dashboard.tab";
@@ -58,6 +59,15 @@ export const AdminScreen: React.FC = () => {
   const [page, setPage] = useState<AdminPage>("dashboard");
   const [collapsed, setCollapsed] = useState(false);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const user = getStoredUser();
   if (!isAuthenticated() || user?.id !== 1) {
@@ -324,9 +334,7 @@ export const AdminScreen: React.FC = () => {
               width: 240,
             }}
           >
-            <Typography sx={{ color: ADMIN_COLOR.mid, fontSize: 13 }}>
-              🔍
-            </Typography>
+            <SearchIcon sx={{ fontSize: 18 }} />
             <InputBase
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -344,12 +352,12 @@ export const AdminScreen: React.FC = () => {
         {/* Content */}
         <Box sx={{ flex: 1, overflowY: "auto", bgcolor: ADMIN_COLOR.bg }}>
           {page === "dashboard" && <DashboardTab />}
-          {page === "products" && <ProductsTab search={search} />}
-          {page === "orders" && <OrdersTab search={search} />}
-          {page === "categories" && <CategoriesTab search={search} />}
-          {page === "bundles" && <BundlesTab search={search} />}
+          {page === "products" && <ProductsTab search={debouncedSearch} />}
+          {page === "orders" && <OrdersTab search={debouncedSearch} />}
+          {page === "categories" && <CategoriesTab search={debouncedSearch} />}
+          {page === "bundles" && <BundlesTab search={debouncedSearch} />}
           {page === "discounts" && <DiscountsTab />}
-          {page === "customers" && <CustomersTab search={search} />}
+          {page === "customers" && <CustomersTab search={debouncedSearch} />}
         </Box>
       </Box>
     </Box>
