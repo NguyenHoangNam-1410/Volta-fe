@@ -7,6 +7,7 @@ import type {
   DiscountApplyResponse,
   PlaceOrderDto,
   RequestAddToCartDto,
+  CartItem
 } from "./cart.interface";
 
 export const addProductToCart = (
@@ -19,8 +20,31 @@ export const deleteCart = (): Promise<ApiResponse<void>> => {
   return axiosInstance.delete("/cart");
 };
 
-export const getCart = (): Promise<ApiResponse<Cart>> => {
-  return axiosInstance.get("/cart");
+
+export const getCart = async (): Promise<ApiResponse<Cart>> => {
+  const res = await axiosInstance.get('/cart');
+  const body = res.data as ApiResponse<Cart>;
+  const cart = body?.data;
+  if (!cart) return body;
+  const apiUrl = import.meta.env.VITE_API_URL || '';
+  const origin = apiUrl ? new URL(apiUrl, window.location.origin).origin : window.location.origin;
+  const mappedItems = cart.items.map((item: CartItem) => {
+    const url_2 = item.image_url || '';
+    if (!url_2 || /^https?:\/\//i.test(url_2)) {
+      return item; // already absolute or empty
+    }
+    return {
+      ...item,
+      image_url: origin + '/Volta' + '/' + url_2,
+    };
+  });
+  return {
+    ...body,
+    data: {
+      ...cart,
+      items: mappedItems,
+    },
+  };
 };
 
 export const updateCartItem = (

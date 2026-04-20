@@ -39,13 +39,11 @@ const badgeVisual: Record<string, { text: string; bg: string }> = {
 };
 
 const resolveProductImageUrl = (imageUrl?: string): string => {
-  if (!imageUrl) return "";
-  if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
-  const apiUrl = import.meta.env.VITE_API_URL as string | undefined;
-  const origin = apiUrl
-    ? new URL(apiUrl, window.location.origin).origin
-    : window.location.origin;
-  return `${origin}${imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`}`;
+    if (!imageUrl) return '';
+    if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
+    const apiUrl = import.meta.env.VITE_API_URL as string | undefined;
+    const origin = apiUrl ? new URL(apiUrl, window.location.origin).origin : window.location.origin;
+    return `${origin}/Volta${imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`}`;
 };
 
 export const ShopScreen: React.FC = () => {
