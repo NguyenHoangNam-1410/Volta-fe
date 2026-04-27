@@ -18,6 +18,7 @@ import type {
 } from "../../../../apis/orders/order.interface";
 import dayjs from "dayjs";
 import { KpiCard } from "./kpi-card.component";
+import { PriceAlertsPanel } from "./price-alerts-panel.component";
 import {
   DAYS_OPTIONS,
   ROW_OPTIONS,
@@ -414,6 +415,14 @@ export const DashboardTab: React.FC = () => {
           />
         </Grid>
       </Grid>
+
+      {/* Price Alerts Panel */}
+      <PriceAlertsPanel
+        filterMode={filterMode}
+        startDate={curStartDate}
+        endDate={curEndDate}
+        days={days}
+      />
 
       {/* Charts row */}
       <Grid container spacing={2} sx={{ mb: 3 }}>

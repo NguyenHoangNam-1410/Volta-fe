@@ -7,6 +7,7 @@ import type { VTableColumn } from "../../../../common/components/VTable";
 import { VButton } from "../../../../common/components/VButton";
 import { ProductFormModal } from "./product-form.modal";
 import { ManageProductImagesModal } from "./manage-product-images.modal";
+import { ManageProductRelationsModal } from "./manage-product-relations.modal";
 import { useSnackbar } from "../../../../common/contexts/snackbar.context";
 import {
   getAllProduct,
@@ -45,6 +46,8 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
   const [submitting, setSubmitting] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [imageTarget, setImageTarget] = useState<Product | null>(null);
+  const [relationModalOpen, setRelationModalOpen] = useState(false);
+  const [relationTarget, setRelationTarget] = useState<Product | null>(null);
 
   const swrKey = ["products", page, PAGE_SIZE, search, categoryFilter];
 
@@ -72,6 +75,11 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
   const handleManageImages = (product: Product) => {
     setImageTarget(product);
     setImageModalOpen(true);
+  };
+
+  const handleManageRelations = (product: Product) => {
+    setRelationTarget(product);
+    setRelationModalOpen(true);
   };
 
   const handleEdit = (product: Product) => {
@@ -245,9 +253,16 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
     {
       key: "actions",
       label: "Actions",
-      width: 150,
+      width: 220,
       render: (r) => (
         <Box sx={{ display: "flex", gap: 0.75 }}>
+          <VButton
+            variant="ghost"
+            size="small"
+            onClick={() => handleManageRelations(r)}
+          >
+            Relations
+          </VButton>
           <VButton
             variant="ghost"
             size="small"
@@ -405,6 +420,12 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ search }) => {
         open={imageModalOpen}
         onClose={() => setImageModalOpen(false)}
         product={imageTarget}
+      />
+
+      <ManageProductRelationsModal
+        open={relationModalOpen}
+        onClose={() => setRelationModalOpen(false)}
+        product={relationTarget}
       />
     </Box>
   );
